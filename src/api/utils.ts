@@ -1,5 +1,5 @@
-export function buildQuery(
-  params: Record<string, string | number | boolean | null | undefined>,
+export function buildQuery<T extends Record<string, unknown>>(
+  params: T,
 ): string {
   const search = new URLSearchParams()
 

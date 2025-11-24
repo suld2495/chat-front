@@ -183,37 +183,51 @@ export function ChatRoomList({ currentUserId, onRoomClick }: ChatRoomListProps) 
     )
   }
 
-  if (rooms.length === 0) {
-    return (
-      <div className="relative flex-1 flex items-center justify-center text-muted">
-        <div className="text-center space-y-2">
-          <div>채팅방이 없습니다. 대화를 시작해 보세요.</div>
-          {createError && (
-            <div className="text-danger text-sm">{createError}</div>
-          )}
-        </div>
+  return (
+    <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 overflow-y-auto">
+        {rooms.length === 0
+          ? (
+              <div className="flex h-full items-center justify-center p-4 text-center text-muted">
+                <div className="space-y-2">
+                  <div>채팅방이 없습니다. 대화를 시작해 보세요.</div>
+                  {createError && (
+                    <div className="text-danger text-sm">{createError}</div>
+                  )}
+                </div>
+              </div>
+            )
+          : (
+              rooms.map(room => (
+                <ChatRoomItem
+                  key={room.id}
+                  room={room}
+                  onClick={() => onRoomClick(room)}
+                />
+              ))
+            )}
+      </div>
+
+      <div className="border-t border-border-default bg-surface p-4">
+        {createError && rooms.length > 0 && (
+          <Typography
+            variant="caption"
+            className="text-danger block mb-2"
+          >
+            {createError}
+          </Typography>
+        )}
         <Button
           variant="primary"
+          fullWidth
           size="sm"
           onClick={handleCreateRoom}
           disabled={isCreating}
-          className="absolute bottom-4 right-4 rounded-full shadow-lg px-4"
+          className="rounded-full shadow-md"
         >
           {isCreating ? '생성 중...' : '채팅방 생성'}
         </Button>
       </div>
-    )
-  }
-
-  return (
-    <div className="flex-1 overflow-y-auto">
-      {rooms.map(room => (
-        <ChatRoomItem
-          key={room.id}
-          room={room}
-          onClick={() => onRoomClick(room)}
-        />
-      ))}
     </div>
   )
 }

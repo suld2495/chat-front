@@ -8,14 +8,21 @@
  * API 에러 클래스
  */
 export class ApiError extends Error {
+  status: number
+  code?: string
+  details?: unknown
+
   constructor(
-    public status: number,
-    public message: string,
-    public code?: string,
-    public details?: unknown,
+    status: number,
+    message: string,
+    code?: string,
+    details?: unknown,
   ) {
     super(message)
     this.name = 'ApiError'
+    this.status = status
+    this.code = code
+    this.details = details
   }
 
   isNetworkError(): boolean {

@@ -8,9 +8,9 @@ import {
 import type {
   Message,
   MessagesPage,
+  MessageUnreadCountResponse,
   ReadMessageRequest,
   SendMessageRequest,
-  UnreadCountResponse,
 } from '@/api'
 
 import {
@@ -21,9 +21,7 @@ import {
   getUnreadMessages,
   markAllMessagesRead,
   markMessageRead,
-
   sendMessage,
-
 } from '@/api'
 
 import { queryKeys } from './queryKeys'
@@ -100,7 +98,7 @@ export function useUnreadMessages(chatRoomId?: string, params?: ReadMessageReque
 export function useUnreadMessageCount(chatRoomId?: string, params?: ReadMessageRequest) {
   const normalized = { userId: params?.userId ?? '' }
 
-  return useQuery<UnreadCountResponse>({
+  return useQuery<MessageUnreadCountResponse>({
     queryKey: chatRoomId
       ? queryKeys.messages.unreadCount(chatRoomId, normalized)
       : queryKeys.messages.unreadCount('', normalized),
@@ -127,7 +125,7 @@ export function useMarkMessageRead(chatRoomId?: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (variables: MarkMessageReadVariables) => markMessageRead(variables.messageId, variables),
+    mutationFn: (variables: MarkMessageReadVariables) => markMessageRead(variables.messageId, { userId: variables.userId }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.messages.room(variables.chatRoomId),
@@ -160,7 +158,7 @@ export function useMarkAllMessagesRead(chatRoomId?: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (variables: ReadMessageRequest) => markAllMessagesRead(chatRoomId!, variables),
+    mutationFn: (variables: ReadMessageRequest) => markAllMessagesRead(chatRoomId!, { userId: variables.userId }),
     onSuccess: (_, variables) => {
       if (!chatRoomId)
         return
@@ -195,7 +193,7 @@ export function useDeleteMessage(chatRoomId?: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (variables: DeleteMessageVariables) => deleteMessage(variables.messageId, variables),
+    mutationFn: (variables: DeleteMessageVariables) => deleteMessage(variables.messageId, { userId: variables.userId }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: queryKeys.messages.room(variables.chatRoomId),

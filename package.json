@@ -19,12 +19,14 @@
     "test:all": "vitest run && playwright test"
   },
   "dependencies": {
+    "@stomp/stompjs": "^7.2.1",
     "@tailwindcss/vite": "^4.1.17",
     "@tanstack/react-query": "^5.90.10",
     "@tanstack/react-query-devtools": "^5.91.0",
     "clsx": "^2.1.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "sockjs-client": "^1.6.1",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.17"
   },
@@ -39,6 +41,7 @@
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
+    "@types/sockjs-client": "^1.5.4",
     "@vitejs/plugin-react": "^5.1.1",
     "@vitest/ui": "^4.0.13",
     "eslint": "^9.39.1",

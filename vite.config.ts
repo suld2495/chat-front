@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite'
+import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-import tailwindcss from "@tailwindcss/vite"
-import path from 'path'
+import path from 'node:path'
+import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -9,15 +9,12 @@ export default defineConfig({
     tailwindcss(),
     react(),
   ],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
+  resolve: { alias: { '@': path.resolve(__dirname, './src') } },
+  define: { global: 'globalThis' },
   build: {
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, 'index.html'),
+        'main': path.resolve(__dirname, 'index.html'),
         'design-system': path.resolve(__dirname, 'design-system.html'),
       },
     },

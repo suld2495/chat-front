@@ -30,6 +30,7 @@ function SendIcon() {
 
 interface ChatInputProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onSubmit'> {
   onSubmit?: (value: string) => void
+  onTyping?: (isTyping: boolean) => void // Typing event callback
   maxHeight?: number // Maximum height in pixels before scrolling
   minHeight?: number // Minimum height in pixels
   fullWidth?: boolean
@@ -37,6 +38,7 @@ interface ChatInputProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaE
 
 export function ChatInput({
   onSubmit,
+  onTyping,
   maxHeight = 200,
   minHeight = 40,
   fullWidth = true,
@@ -47,6 +49,7 @@ export function ChatInput({
 }: ChatInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [internalValue, setInternalValue] = useState('')
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   // Use controlled value if provided, otherwise use internal state
   const value = controlledValue !== undefined ? controlledValue : internalValue
@@ -85,7 +88,32 @@ export function ChatInput({
       setInternalValue(e.target.value)
     }
     onChange?.(e)
+
+    // Typing event handling
+    if (onTyping) {
+      // Send typing start event
+      onTyping(true)
+
+      // Clear existing timeout
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
+      }
+
+      // Send typing stop event after 1 second of inactivity
+      typingTimeoutRef.current = setTimeout(() => {
+        onTyping(false)
+      }, 1000)
+    }
   }
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
+      }
+    }
+  }, [])
 
   // Handle keyboard events
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
