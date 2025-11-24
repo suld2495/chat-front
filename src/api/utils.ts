@@ -1,4 +1,4 @@
-export function buildQuery<T extends Record<string, unknown>>(
+export function buildQuery<T extends object>(
   params: T,
 ): string {
   const search = new URLSearchParams()
