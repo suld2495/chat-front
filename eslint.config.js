@@ -56,6 +56,24 @@ export default antfu(
         },
       ],
 
+      'perfectionist/sort-imports': [
+        'error',
+        {
+          groups: [
+            'type',
+            ['builtin', 'external'],
+            'internal-type',
+            'internal',
+            ['parent-type', 'sibling-type', 'index-type'],
+            ['parent', 'sibling', 'index'],
+            'object',
+            'unknown',
+          ],
+          internalPattern: ['^@/.*'],
+          newlinesBetween: 'always',
+        },
+      ],
+
       // Object/destructuring formatting (3+ properties)
       'style/object-curly-newline': [
         'error',

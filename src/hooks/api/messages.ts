@@ -1,3 +1,10 @@
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
+
 import type {
   Message,
   MessagesPage,
@@ -5,12 +12,7 @@ import type {
   SendMessageRequest,
   UnreadCountResponse,
 } from '@/api'
-import {
-  keepPreviousData,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query'
+
 import {
   deleteMessage,
   getMessages,
@@ -23,6 +25,7 @@ import {
   sendMessage,
 
 } from '@/api'
+
 import { queryKeys } from './queryKeys'
 
 interface MessageListParams extends ReadMessageRequest {

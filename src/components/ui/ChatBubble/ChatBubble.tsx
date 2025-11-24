@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
+
 import { cn } from '@/lib/utils'
+
 import { TypingIndicator } from './TypingIndicator'
 
 interface ChatBubbleProps extends React.HTMLAttributes<HTMLDivElement> {

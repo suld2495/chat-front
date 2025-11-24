@@ -1,12 +1,14 @@
-import type { ToastProps } from './types'
 import {
   useCallback,
   useEffect,
   useState,
 } from 'react'
+
 import { IconButton } from '@/components/ui/IconButton/IconButton'
 import { Typography } from '@/components/ui/Typography/Typography'
 import { cn } from '@/lib/utils'
+
+import type { ToastProps } from './types'
 
 export function Toast({
   message,

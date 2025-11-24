@@ -4,7 +4,9 @@ import { buildQuery } from './utils'
 export interface Message {
   id: string
   chatRoomId: string
-  senderId: string
+  sender: {
+    id: string
+  }
   content: string
   messageType: string
   createdAt?: string

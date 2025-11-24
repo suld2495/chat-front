@@ -1,5 +1,7 @@
-import type { TabItem } from '@/components/chat/BottomTabs'
 import { useState } from 'react'
+
+import type { TabItem } from '@/components/chat/BottomTabs'
+
 import { BottomTabs } from '@/components/chat/BottomTabs'
 import { ChatPanel, SettingsPanel } from '@/components/chat/panel'
 import { cn } from '@/lib/utils'

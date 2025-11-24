@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+
 import { Button } from '../components/ui/Button/Button'
 import { ChatBubble, TypingIndicator } from '../components/ui/ChatBubble'
 import { IconButton } from '../components/ui/IconButton/IconButton'

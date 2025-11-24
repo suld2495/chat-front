@@ -1,6 +1,8 @@
-import type { User } from './api'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
+
+import type { User } from './api'
+
 import { searchUsers } from './api'
 import { ChatWidget } from './components/chat/ChatWidget'
 import { Typography } from './components/ui/Typography/Typography'

@@ -1,5 +1,7 @@
-import type { ChatRoomListItem } from '@/components/chat/ChatRoomList'
 import { useState } from 'react'
+
+import type { ChatRoomListItem } from '@/components/chat/ChatRoomList'
+
 import { ChatRoom as ChatRoomView } from '@/components/chat/ChatRoom'
 import { ChatRoomList } from '@/components/chat/ChatRoomList'
 import { Typography } from '@/components/ui/Typography/Typography'

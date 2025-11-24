@@ -1,14 +1,16 @@
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
+
 import type {
   CreateUserRequest,
   UpdateUserProfileRequest,
   UpdateUserStatusRequest,
   User,
 } from '@/api'
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query'
+
 import {
   createUser,
 
@@ -20,6 +22,7 @@ import {
   updateUserStatus,
 
 } from '@/api'
+
 import { queryKeys } from './queryKeys'
 
 export function useUser(userId?: string) {

@@ -1,5 +1,7 @@
-import type { Message as MessageEntity } from '@/api'
 import { useEffect, useMemo } from 'react'
+
+import type { Message as MessageEntity } from '@/api'
+
 import { ChatInput } from '@/components/chat/ChatInput'
 import { Button } from '@/components/ui/Button/Button'
 import { IconButton } from '@/components/ui/IconButton/IconButton'
@@ -179,7 +181,7 @@ export function ChatRoom({
           <MessageBubble
             key={message.id}
             message={message}
-            isMine={message.senderId === currentUserId}
+            isMine={message.sender.id === currentUserId}
           />
         ))}
       </div>

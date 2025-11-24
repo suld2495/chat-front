@@ -1,6 +1,9 @@
-import type { ToastPosition, ToastProps } from './types'
 import { createPortal } from 'react-dom'
+
 import { cn } from '@/lib/utils'
+
+import type { ToastPosition, ToastProps } from './types'
+
 import { Toast } from './Toast'
 
 interface ToastContainerProps {

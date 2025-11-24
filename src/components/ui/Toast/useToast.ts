@@ -1,5 +1,7 @@
-import type { ToastOptions } from './types'
 import { useMemo } from 'react'
+
+import type { ToastOptions } from './types'
+
 import { useToastContext } from './ToastContext'
 
 interface ToastFunction {

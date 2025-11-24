@@ -1,5 +1,7 @@
-import type { ChatRoom as ChatRoomEntity } from '@/api'
 import { useState } from 'react'
+
+import type { ChatRoom as ChatRoomEntity } from '@/api'
+
 import { Button } from '@/components/ui/Button/Button'
 import { Typography } from '@/components/ui/Typography/Typography'
 import { useCreateChatRoom, useUserChatRooms } from '@/hooks/api'

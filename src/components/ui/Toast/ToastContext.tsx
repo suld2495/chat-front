@@ -1,9 +1,5 @@
 import type { ReactNode } from 'react'
-import type {
-  ToastOptions,
-  ToastPosition,
-  ToastProps,
-} from './types'
+
 import {
   createContext,
   use,
@@ -11,6 +7,13 @@ import {
   useMemo,
   useState,
 } from 'react'
+
+import type {
+  ToastOptions,
+  ToastPosition,
+  ToastProps,
+} from './types'
+
 import { ToastContainer } from './ToastContainer'
 
 interface ToastContextValue {
