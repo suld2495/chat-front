@@ -114,7 +114,12 @@ export function ChatRoom({
   const hasUser = Boolean(currentUserId)
   const queryClient = useQueryClient()
   const [isOtherUserTyping, setIsOtherUserTyping] = useState(false)
+  const [isBotResponding, setIsBotResponding] = useState(false)
+  const [animatedContent, setAnimatedContent] = useState<Record<string, string>>({})
+  const [isSessionEnded, setIsSessionEnded] = useState(false)
+  const [systemMessage, setSystemMessage] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const animationTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
   const listKey = useMemo(
     () => queryKeys.messages.list(roomId, {
@@ -124,6 +129,27 @@ export function ChatRoom({
     }),
     [roomId, currentUserId],
   )
+
+  const startTypingAnimation = useCallback((messageId: string, fullText: string) => {
+    if (animationTimersRef.current[messageId]) {
+      return
+    }
+
+    setAnimatedContent(prev => ({ ...prev, [messageId]: '' }))
+
+    const step = (index: number) => {
+      if (index >= fullText.length) {
+        setAnimatedContent(prev => ({ ...prev, [messageId]: fullText }))
+        delete animationTimersRef.current[messageId]
+        return
+      }
+
+      setAnimatedContent(prev => ({ ...prev, [messageId]: fullText.slice(0, index + 1) }))
+      animationTimersRef.current[messageId] = setTimeout(() => step(index + 1), 15)
+    }
+
+    animationTimersRef.current[messageId] = setTimeout(() => step(0), 15)
+  }, [])
 
   const {
     data: messagesPage,
@@ -169,15 +195,24 @@ export function ChatRoom({
   // 실시간 메시지 수신 처리
   const handleNewMessage = useCallback(
     (wsMessage: WebSocketMessage) => {
-      // WebSocket 수신 메시지를 React Query 캐시에 반영
-      if (wsMessage.chatMessageType && wsMessage.chatMessageType !== 'CHAT') {
-        return
-      }
-
       const messageId = wsMessage.id || wsMessage.messageId || `temp-${Date.now()}`
       const createdAt = wsMessage.createdAt || wsMessage.timestamp || new Date().toISOString()
       const messageType = wsMessage.messageType || 'TEXT'
       const senderId = wsMessage.senderId
+      const isFromOtherUser = !senderId || senderId !== currentUserId
+
+      // SYSTEM 메시지 타입 감지 (토큰 한도 초과 등)
+      if (messageType === 'SYSTEM') {
+        setIsSessionEnded(true)
+        setSystemMessage(wsMessage.content)
+        setIsBotResponding(false)
+        return
+      }
+
+      // 봇 응답 도착 시 타이핑 표시 해제 (senderId가 없거나, 다른 사용자일 때 모두 해제)
+      if (isFromOtherUser) {
+        setIsBotResponding(false)
+      }
 
       queryClient.setQueryData(
         listKey,
@@ -200,6 +235,10 @@ export function ChatRoom({
           if (isDuplicate)
             return oldData
 
+          if (isFromOtherUser && wsMessage.content) {
+            startTypingAnimation(messageId, wsMessage.content)
+          }
+
           const nextContent = [...prevContent, newMessage]
           return {
             ...oldData,
@@ -211,7 +250,7 @@ export function ChatRoom({
         },
       )
     },
-    [queryClient, listKey],
+    [queryClient, listKey, currentUserId, startTypingAnimation],
   )
 
   // 타이핑 이벤트 수신 처리
@@ -255,12 +294,59 @@ export function ChatRoom({
     if (!content || !currentUserId || !isConnected)
       return
 
+    const trimmedContent = content.trim()
+    if (!trimmedContent)
+      return
+
+    const optimisticId = `local-${Date.now()}`
+    const createdAt = new Date().toISOString()
+
+    // Optimistically show my message so the UI updates even if the server doesn't echo it back
+    queryClient.setQueryData(
+      listKey,
+      (oldData: typeof messagesPage) => {
+        const prevContent = oldData?.content ?? []
+        const optimisticMessage: MessageEntity = {
+          id: optimisticId,
+          chatRoomId: roomId,
+          senderId: currentUserId,
+          sender: { id: currentUserId },
+          content: trimmedContent,
+          messageType: 'TEXT',
+          createdAt,
+          readAt: null,
+        }
+
+        const baseData = oldData ?? {
+          content: [],
+          totalElements: 0,
+          numberOfElements: 0,
+          empty: true,
+        }
+
+        return {
+          ...baseData,
+          content: [...prevContent, optimisticMessage],
+          totalElements: (baseData.totalElements ?? prevContent.length) + 1,
+          numberOfElements: (baseData.numberOfElements ?? prevContent.length) + 1,
+          empty: false,
+        }
+      },
+    )
+
+    setIsBotResponding(true)
+
     sendMessage({
       chatRoomId: roomId,
       senderId: currentUserId,
-      content,
+      content: trimmedContent,
       messageType: 'TEXT',
       chatMessageType: 'CHAT',
+    })
+
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.messages.room(roomId),
+      exact: false,
     })
   }
 
@@ -283,6 +369,26 @@ export function ChatRoom({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [orderedMessages])
+
+  // 타이핑 인디케이터가 나타날 때도 스크롤을 맨 아래로 이동
+  useEffect(() => {
+    if (isOtherUserTyping || isBotResponding) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [isOtherUserTyping, isBotResponding])
+
+  // 봇 응답 애니메이션(타자 치는 효과) 중에도 스크롤을 유지
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [animatedContent])
+
+  // 애니메이션 타이머 정리
+  useEffect(() => {
+    return () => {
+      Object.values(animationTimersRef.current).forEach(timer => clearTimeout(timer))
+      animationTimersRef.current = {}
+    }
+  }, [])
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
@@ -348,18 +454,46 @@ export function ChatRoom({
         {orderedMessages.map((message) => {
           const senderId = message.sender?.id ?? message.senderId ?? ''
           const isMine = senderId === currentUserId
+          const displayContent = animatedContent[message.id] ?? message.content ?? ''
 
           return (
             <MessageBubble
               key={message.id}
-              message={message}
+              message={{ ...message, content: displayContent }}
               isMine={isMine}
             />
           )
         })}
 
+        {/* 세션 종료 알림 (토큰 한도 초과 등) */}
+        {isSessionEnded && systemMessage && (
+          <div className="my-4 mx-auto max-w-md">
+            <div className="bg-warning/10 border border-warning rounded-lg p-4 text-center">
+              <Typography
+                variant="body"
+                size="sm"
+                className="text-warning font-medium mb-2"
+              >
+                ⚠️ 세션 종료
+              </Typography>
+              <Typography
+                variant="body"
+                size="sm"
+                className="text-body"
+              >
+                {systemMessage}
+              </Typography>
+            </div>
+          </div>
+        )}
+
         {/* 타이핑 인디케이터 */}
-        {isOtherUserTyping && (
+        {(() => {
+          const lastMessage = orderedMessages[orderedMessages.length - 1]
+          const lastSenderId = lastMessage ? (lastMessage.sender?.id ?? lastMessage.senderId ?? '') : ''
+          const showBotTyping = isBotResponding && lastSenderId === currentUserId
+          return isOtherUserTyping || showBotTyping
+        })() && (
           <div className="flex justify-start mb-4">
             <div className="max-w-[70%] px-4 py-2 rounded-2xl bg-surface-raised rounded-bl-sm">
               <TypingIndicator size="md" />
@@ -380,7 +514,7 @@ export function ChatRoom({
               maxHeight={120}
               onSubmit={handleSend}
               onTyping={handleTyping}
-              disabled={!isConnected || !hasUser}
+              disabled={!isConnected || !hasUser || isSessionEnded}
             />
           </div>
         </div>
