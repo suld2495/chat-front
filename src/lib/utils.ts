@@ -1,12 +1,10 @@
 import type { ClassValue } from 'clsx'
 
 import { clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import { extendTailwindMerge } from 'tailwind-merge'
 
-/**
- * Merges Tailwind CSS classes with clsx and tailwind-merge
- * Handles conditional classes and resolves Tailwind conflicts
- */
+const customTwMerge = extendTailwindMerge<'typography'>({ extend: { classGroups: { typography: [{ typography: [(value: string) => value.startsWith('text-')] }] } } })
+
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return customTwMerge(clsx(inputs))
 }

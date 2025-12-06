@@ -1,0 +1,218 @@
+/* ============================================
+   Foundation Tokens
+   ============================================
+   Layer 1: Base design tokens
+   Skin-agnostic values that define the design scale
+
+   Tailwind CSS 4 Official Namespaces:
+   - --spacing-* → p-*, m-*, gap-*, w-*, h-*, size-*
+   - --radius-* → rounded-*
+   - --text-* → text-* (font-size)
+   - --shadow-* → shadow-*
+   - --leading-* → leading-*
+   - --ease-* → ease-*
+*/
+
+@theme {
+  /* ============================================
+     Spacing (--spacing-* namespace)
+     Usage: p-xs, m-s, gap-m, w-button-sm, h-input-md
+     ============================================ */
+  /* Base Spacing */
+  --spacing-none: 0;
+  --spacing-xs: 4px;
+  --spacing-s: 8px;
+  --spacing-m: 16px;
+  --spacing-l: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+
+  /* Button Heights */
+  --spacing-button-sm: 32px;
+  --spacing-button-md: 40px;
+  --spacing-button-lg: 48px;
+
+  /* Input Heights */
+  --spacing-input-xs: 28px;
+  --spacing-input-sm: 36px;
+  --spacing-input-md: 44px;
+  --spacing-input-lg: 52px;
+
+  /* IconButton Sizes */
+  --spacing-icon-button-sm: 24px;
+  --spacing-icon-button-md: 32px;
+  --spacing-icon-button-lg: 40px;
+
+  /* Icon Sizes */
+  --spacing-icon-xs: 12px;
+  --spacing-icon-s: 16px;
+  --spacing-icon-m: 20px;
+  --spacing-icon-l: 24px;
+  --spacing-icon-xl: 32px;
+  --spacing-icon-xxl: 48px;
+
+  /* Toggle Track */
+  --spacing-toggle-track-w-sm: 32px;
+  --spacing-toggle-track-w-md: 44px;
+  --spacing-toggle-track-w-lg: 56px;
+  --spacing-toggle-track-h-sm: 16px;
+  --spacing-toggle-track-h-md: 24px;
+  --spacing-toggle-track-h-lg: 28px;
+
+  /* Toggle Thumb */
+  --spacing-toggle-thumb-sm: 12px;
+  --spacing-toggle-thumb-md: 20px;
+  --spacing-toggle-thumb-lg: 24px;
+
+  /* ============================================
+     Border Radius (--radius-* namespace)
+     Usage: rounded-s, rounded-m, rounded-l
+     ============================================ */
+  --radius-none: 0;
+  --radius-s: 4px;
+  --radius-m: 8px;
+  --radius-l: 16px;
+  --radius-xl: 24px;
+  --radius-round: 9999px;
+
+  /* ============================================
+     Typography Size (--text-* namespace)
+     Usage: text-xs, text-s, text-m, text-l
+     ============================================ */
+  --text-xs: 10px;
+  --text-s: 12px;
+  --text-m: 14px;
+  --text-l: 16px;
+  --text-xl: 20px;
+  --text-xxl: 24px;
+  --text-title: 32px;
+  --text-display: 40px;
+  --text-hero: 48px;
+  --text-giant: 64px;
+
+  /* ============================================
+     Typography Line Height (--leading-* namespace)
+     Usage: leading-tight, leading-normal
+     ============================================ */
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+
+  /* ============================================
+     Shadow (--shadow-* namespace)
+     Usage: shadow-s, shadow-m, shadow-l
+     ============================================ */
+  --shadow-s: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-m: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-l: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  /* ============================================
+     Motion Easing (--ease-* namespace)
+     Usage: ease-linear, ease-in, ease-out
+     ============================================ */
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ============================================
+     Motion Duration (not in official namespace)
+     ============================================ */
+  --duration-instant: 100ms;
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+  --duration-slower: 600ms;
+
+  /* ============================================
+     Z-Index
+     ============================================ */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-popover: 600;
+  --z-tooltip: 700;
+  --z-toast: 800;
+
+  /* ============================================
+     Opacity
+     ============================================ */
+  --opacity-transparent: 0;
+  --opacity-disabled: 0.4;
+  --opacity-subtle: 0.6;
+  --opacity-medium: 0.8;
+  --opacity-solid: 1;
+}
+
+/* ============================================
+   Responsive Container Padding
+   ============================================ */
+:root {
+  --container-padding: 16px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --container-padding: 24px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --container-padding: 32px;
+  }
+}
+
+/* ============================================
+   Responsive Section Gap
+   ============================================ */
+:root {
+  --section-gap: 24px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --section-gap: 40px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --section-gap: 56px;
+  }
+}
+
+/* ============================================
+   Responsive Grid Gutter
+   ============================================ */
+:root {
+  --grid-gutter: 12px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --grid-gutter: 20px;
+  }
+}
+
+/* ============================================
+   Responsive Page Title
+   ============================================ */
+:root {
+  --page-title-size: 24px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --page-title-size: 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --page-title-size: 40px;
+  }
+}

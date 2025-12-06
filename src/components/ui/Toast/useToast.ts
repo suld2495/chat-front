@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 
 import type { ToastOptions } from './types'
 
-import { useToastContext } from './ToastContext'
+import { useToastContext } from './toast-context'
 
 interface ToastFunction {
   (options: ToastOptions | string): string
@@ -25,7 +25,6 @@ export function useToast(): UseToastReturn {
   const { addToast, removeToast } = useToastContext()
 
   return useMemo(() => {
-    // 기본 toast 함수
     const toastFn = (options: ToastOptions | string): string => {
       if (typeof options === 'string') {
         return addToast({ message: options })
@@ -33,7 +32,6 @@ export function useToast(): UseToastReturn {
       return addToast(options)
     }
 
-    // variant별 함수들
     const successFn = (options: ToastOptions | string): string => {
       if (typeof options === 'string') {
         return addToast({
@@ -86,7 +84,6 @@ export function useToast(): UseToastReturn {
       })
     }
 
-    // toast 함수에 메서드 추가 (Object.assign 사용)
     const toast = Object.assign(toastFn, {
       success: successFn,
       error: errorFn,

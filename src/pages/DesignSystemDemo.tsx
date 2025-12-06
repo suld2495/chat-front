@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react'
 
-import { Button } from '../components/ui/Button/Button'
-import { ChatBubble, TypingIndicator } from '../components/ui/ChatBubble'
-import { IconButton } from '../components/ui/IconButton/IconButton'
-import { Input } from '../components/ui/Input/Input'
-import { Skeleton } from '../components/ui/Skeleton/Skeleton'
-import { useToast } from '../components/ui/Toast'
-import { Toggle } from '../components/ui/Toggle/Toggle'
-import { Typography } from '../components/ui/Typography/Typography'
+import { Button } from '../components/ui/button'
+import { ChatBubble } from '../components/ui/chat-bubble'
+import { IconButton } from '../components/ui/icon-button'
+import { Input } from '../components/ui/input'
+import { Skeleton } from '../components/ui/skeleton'
+import { useToast } from '../components/ui/toast'
+import { Toggle } from '../components/ui/toggle'
+import { TypingIndicator } from '../components/ui/typing-indicator'
+import { Typography } from '../components/ui/typography'
 
-// 간단한 아이콘 컴포넌트들
 function SearchIcon() {
   return (
     <svg
@@ -136,7 +136,6 @@ function PlusIcon() {
   )
 }
 
-// 간단한 아바타 컴포넌트
 function Avatar({ children, size = 'md' }: { children: React.ReactNode, size?: 'sm' | 'md' | 'lg' }) {
   const sizeClasses = {
     sm: 'w-8 h-8 text-xs',
@@ -151,7 +150,6 @@ function Avatar({ children, size = 'md' }: { children: React.ReactNode, size?: '
   )
 }
 
-// 스켈레톤 전환 데모 컴포넌트
 function SkeletonTransitionDemo() {
   const [isLoaded, setIsLoaded] = useState(false)
 
@@ -194,7 +192,6 @@ function SkeletonTransitionDemo() {
   )
 }
 
-// 사용자 프로필 카드 데모
 function SkeletonProfileDemo() {
   const [isLoaded, setIsLoaded] = useState(false)
 
@@ -205,7 +202,6 @@ function SkeletonProfileDemo() {
 
   return (
     <div className="flex items-start gap-4">
-      {/* 아바타 */}
       <Skeleton
         variant="circular"
         isLoaded={isLoaded}
@@ -215,7 +211,6 @@ function SkeletonProfileDemo() {
         </div>
       </Skeleton>
 
-      {/* 정보 */}
       <div className="flex-1 space-y-2">
         <Skeleton
           variant="text"
@@ -252,7 +247,6 @@ function SkeletonProfileDemo() {
         </Skeleton>
       </div>
 
-      {/* 액션 버튼 */}
       <Skeleton
         variant="button"
         className="w-20"
@@ -269,7 +263,6 @@ function SkeletonProfileDemo() {
   )
 }
 
-// 블로그 카드 데모
 function SkeletonBlogDemo() {
   const [isLoaded, setIsLoaded] = useState(false)
 
@@ -280,7 +273,6 @@ function SkeletonBlogDemo() {
 
   return (
     <div className="max-w-md">
-      {/* 썸네일 이미지 */}
       <Skeleton
         variant="rectangular"
         className="h-48 rounded-lg"
@@ -289,9 +281,7 @@ function SkeletonBlogDemo() {
         <div className="h-48 rounded-lg bg-linear-to-br from-primary to-secondary" />
       </Skeleton>
 
-      {/* 콘텐츠 */}
       <div className="mt-4 space-y-3">
-        {/* 제목 */}
         <Skeleton
           variant="text"
           className="h-6 w-full"
@@ -305,7 +295,6 @@ function SkeletonBlogDemo() {
           </Typography>
         </Skeleton>
 
-        {/* 본문 */}
         <div className="space-y-2">
           <Skeleton
             variant="text"
@@ -334,7 +323,6 @@ function SkeletonBlogDemo() {
           </Skeleton>
         </div>
 
-        {/* 메타 정보 */}
         <div className="flex items-center gap-3 pt-2">
           <Skeleton
             variant="circular"
@@ -361,7 +349,6 @@ function SkeletonBlogDemo() {
   )
 }
 
-// 채팅 버블 타이핑 전환 데모
 function ChatBubbleTypingDemo() {
   const [isTyping, setIsTyping] = useState(true)
 
@@ -406,7 +393,6 @@ function ChatBubbleTypingDemo() {
   )
 }
 
-// 채팅 버블 타이프라이터 효과 데모
 function ChatBubbleTypewriterDemo() {
   const [isTyping, setIsTyping] = useState(true)
   const [showTypewriter, setShowTypewriter] = useState(false)
@@ -486,7 +472,6 @@ export function DesignSystemDemo() {
 
   return (
     <div className="min-h-screen bg-surface text-body transition-colors">
-      {/* Header with Dark Mode Toggle */}
       <header className="border-b border-border-default bg-surface-sunken">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center text-xs">
           <Typography
@@ -508,7 +493,6 @@ export function DesignSystemDemo() {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-12 space-y-16">
-        {/* Typography Section */}
         <section className="space-y-6">
           <Typography
             variant="hero"
@@ -527,7 +511,6 @@ export function DesignSystemDemo() {
           </div>
         </section>
 
-        {/* Button Section */}
         <section className="space-y-6">
           <Typography
             variant="hero"
@@ -536,7 +519,6 @@ export function DesignSystemDemo() {
             Buttons
           </Typography>
 
-          {/* Button Variants */}
           <div className="space-y-4">
             <Typography variant="subtitle">Variants</Typography>
             <div className="flex flex-wrap gap-3 bg-surface-sunken p-6 rounded-lg">
@@ -548,7 +530,6 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* Button Sizes */}
           <div className="space-y-4">
             <Typography variant="subtitle">Sizes</Typography>
             <div className="flex flex-wrap items-center gap-3 bg-surface-sunken p-6 rounded-lg">
@@ -558,7 +539,6 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* Button States */}
           <div className="space-y-4">
             <Typography variant="subtitle">States</Typography>
             <div className="flex flex-wrap gap-3 bg-surface-sunken p-6 rounded-lg">
@@ -568,11 +548,9 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* Buttons with Icons */}
           <div className="space-y-4">
             <Typography variant="subtitle">Buttons with Icons</Typography>
 
-            {/* Left Icon */}
             <div className="space-y-2">
               <Typography
                 variant="caption"
@@ -603,7 +581,6 @@ export function DesignSystemDemo() {
               </div>
             </div>
 
-            {/* Right Icon */}
             <div className="space-y-2">
               <Typography
                 variant="caption"
@@ -628,7 +605,6 @@ export function DesignSystemDemo() {
               </div>
             </div>
 
-            {/* Both Icons */}
             <div className="space-y-2">
               <Typography
                 variant="caption"
@@ -653,7 +629,6 @@ export function DesignSystemDemo() {
               </div>
             </div>
 
-            {/* Different Sizes with Icons */}
             <div className="space-y-2">
               <Typography
                 variant="caption"
@@ -683,7 +658,6 @@ export function DesignSystemDemo() {
               </div>
             </div>
 
-            {/* Different Variants with Icons */}
             <div className="space-y-2">
               <Typography
                 variant="caption"
@@ -727,7 +701,6 @@ export function DesignSystemDemo() {
           </div>
         </section>
 
-        {/* Input Section */}
         <section className="space-y-6">
           <Typography
             variant="hero"
@@ -736,7 +709,6 @@ export function DesignSystemDemo() {
             Inputs
           </Typography>
 
-          {/* Input Variants */}
           <div className="space-y-4">
             <Typography variant="subtitle">Variants</Typography>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-surface-sunken p-6 rounded-lg">
@@ -759,7 +731,6 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* Input Sizes */}
           <div className="space-y-4">
             <Typography variant="subtitle">Sizes</Typography>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-surface-sunken p-6 rounded-lg">
@@ -782,7 +753,6 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* Input States */}
           <div className="space-y-4">
             <Typography variant="subtitle">States</Typography>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-surface-sunken p-6 rounded-lg">
@@ -812,7 +782,6 @@ export function DesignSystemDemo() {
           </div>
         </section>
 
-        {/* Toggle Section */}
         <section className="space-y-6">
           <Typography
             variant="hero"
@@ -821,10 +790,9 @@ export function DesignSystemDemo() {
             Toggles
           </Typography>
 
-          {/* Toggle Variants */}
           <div className="space-y-4">
             <Typography variant="subtitle">Variants</Typography>
-            <div className="flex flex-col gap-4 bg-surface-sunken p-6 rounded-lg">
+            <div className="flex flex-col gap-4  p-6 rounded-lg">
               <Toggle
                 variant="primary"
                 label="Primary Toggle"
@@ -840,10 +808,9 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* Toggle Sizes */}
           <div className="space-y-4">
             <Typography variant="subtitle">Sizes</Typography>
-            <div className="flex flex-col gap-4 bg-surface-sunken p-6 rounded-lg">
+            <div className="flex flex-col gap-4 p-6 rounded-lg">
               <Toggle
                 size="sm"
                 label="Small Toggle"
@@ -859,10 +826,9 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* Toggle States */}
           <div className="space-y-4">
             <Typography variant="subtitle">States</Typography>
-            <div className="flex flex-col gap-4 bg-surface-sunken p-6 rounded-lg">
+            <div className="flex flex-col gap-4 p-6 rounded-lg">
               <Toggle label="Normal Toggle" />
               <Toggle
                 label="Checked by Default"
@@ -880,10 +846,9 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* Toggle Label Positions */}
           <div className="space-y-4">
             <Typography variant="subtitle">Label Positions</Typography>
-            <div className="flex flex-col gap-4 bg-surface-sunken p-6 rounded-lg">
+            <div className="flex flex-col gap-4 p-6 rounded-lg">
               <Toggle
                 label="Label on Left"
                 labelPosition="left"
@@ -896,10 +861,9 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* Toggle Controlled Example */}
           <div className="space-y-4">
             <Typography variant="subtitle">Controlled Toggle</Typography>
-            <div className="bg-surface-sunken p-6 rounded-lg">
+            <div className="p-6 rounded-lg">
               <Toggle
                 label={darkMode ? '다크 모드 활성화됨' : '다크 모드 비활성화됨'}
                 checked={darkMode}
@@ -909,7 +873,6 @@ export function DesignSystemDemo() {
           </div>
         </section>
 
-        {/* Form Example */}
         <section className="space-y-6">
           <Typography
             variant="hero"
@@ -958,7 +921,6 @@ export function DesignSystemDemo() {
           </div>
         </section>
 
-        {/* IconButton Section */}
         <section className="space-y-6">
           <Typography
             variant="hero"
@@ -967,7 +929,6 @@ export function DesignSystemDemo() {
             Icon Buttons
           </Typography>
 
-          {/* IconButton Sizes */}
           <div className="space-y-4">
             <Typography variant="subtitle">Sizes</Typography>
             <div className="flex items-center gap-3 bg-surface-sunken p-6 rounded-lg">
@@ -1028,7 +989,6 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* IconButton Variants */}
           <div className="space-y-4">
             <Typography variant="subtitle">Variants</Typography>
             <div className="flex items-center gap-3 bg-surface-sunken p-6 rounded-lg">
@@ -1053,7 +1013,6 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* IconButton Shapes */}
           <div className="space-y-4">
             <Typography variant="subtitle">Shapes</Typography>
             <div className="flex items-center gap-3 bg-surface-sunken p-6 rounded-lg">
@@ -1072,7 +1031,6 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* IconButton States */}
           <div className="space-y-4">
             <Typography variant="subtitle">States</Typography>
             <div className="flex items-center gap-3 bg-surface-sunken p-6 rounded-lg">
@@ -1088,7 +1046,6 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* IconButton Use Cases */}
           <div className="space-y-4">
             <Typography variant="subtitle">실제 사용 예시</Typography>
             <div className="flex flex-wrap gap-3 bg-surface-sunken p-6 rounded-lg">
@@ -1206,7 +1163,6 @@ export function DesignSystemDemo() {
           </div>
         </section>
 
-        {/* Toast Section */}
         <section className="space-y-6">
           <Typography
             variant="hero"
@@ -1215,7 +1171,6 @@ export function DesignSystemDemo() {
             Toasts
           </Typography>
 
-          {/* Basic Toast */}
           <div className="space-y-4">
             <Typography variant="subtitle">기본 Toast (메시지만)</Typography>
             <div className="flex flex-wrap gap-3 bg-surface-sunken p-6 rounded-lg">
@@ -1231,7 +1186,6 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* Toast Variants */}
           <div className="space-y-4">
             <Typography variant="subtitle">Variants</Typography>
             <div className="flex flex-wrap gap-3 bg-surface-sunken p-6 rounded-lg">
@@ -1256,7 +1210,6 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* Toast Options */}
           <div className="space-y-4">
             <Typography variant="subtitle">옵션</Typography>
             <div className="flex flex-wrap gap-3 bg-surface-sunken p-6 rounded-lg">
@@ -1278,7 +1231,6 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* Toast Positions */}
           <div className="space-y-4">
             <Typography variant="subtitle">위치</Typography>
             <div className="grid grid-cols-3 gap-3 bg-surface-sunken p-6 rounded-lg">
@@ -1303,7 +1255,6 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* Custom Content */}
           <div className="space-y-4">
             <Typography variant="subtitle">커스텀 콘텐츠</Typography>
             <div className="flex flex-wrap gap-3 bg-surface-sunken p-6 rounded-lg">
@@ -1329,7 +1280,6 @@ export function DesignSystemDemo() {
           </div>
         </section>
 
-        {/* Color Tokens Demo */}
         <section className="space-y-6">
           <Typography
             variant="hero"
@@ -1339,25 +1289,23 @@ export function DesignSystemDemo() {
           </Typography>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {[
-              { name: 'Primary', class: 'bg-primary' },
-              { name: 'Secondary', class: 'bg-secondary' },
-              { name: 'Success', class: 'bg-success' },
-              { name: 'Error', class: 'bg-error' },
-              { name: 'Warning', class: 'bg-warning' },
-              { name: 'Info', class: 'bg-info' },
+              { name: 'Primary', class: 'bg-action-primary' },
+              { name: 'Secondary', class: 'bg-action-secondary' },
+              { name: 'Success', class: 'bg-bg-success' },
+              { name: 'Error', class: 'bg-bg-error' },
+              { name: 'Warning', class: 'bg-bg-warning' },
+              { name: 'Info', class: 'bg-bg-info' },
             ].map(color => (
               <div
                 key={color.name}
                 className="space-y-2"
               >
                 <div className={`${color.class} h-20 rounded-lg`} />
-                <Typography variant="caption">{color.name}</Typography>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Skeleton Section */}
         <section className="space-y-6">
           <Typography
             variant="hero"
@@ -1366,11 +1314,9 @@ export function DesignSystemDemo() {
             Skeleton Loading
           </Typography>
 
-          {/* Basic Variants */}
           <div className="space-y-4">
             <Typography variant="subtitle">기본 Variants</Typography>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-surface-sunken p-6 rounded-lg">
-              {/* Text Variant */}
               <div className="space-y-2">
                 <Typography
                   variant="caption"
@@ -1389,7 +1335,6 @@ export function DesignSystemDemo() {
                 />
               </div>
 
-              {/* Circular Variant */}
               <div className="space-y-2">
                 <Typography
                   variant="caption"
@@ -1400,7 +1345,6 @@ export function DesignSystemDemo() {
                 <Skeleton variant="circular" />
               </div>
 
-              {/* Rectangular Variant */}
               <div className="space-y-2">
                 <Typography
                   variant="caption"
@@ -1411,7 +1355,6 @@ export function DesignSystemDemo() {
                 <Skeleton variant="rectangular" />
               </div>
 
-              {/* Button Variant */}
               <div className="space-y-2">
                 <Typography
                   variant="caption"
@@ -1424,7 +1367,6 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* Loading Transition Demo */}
           <div className="space-y-4">
             <Typography variant="subtitle">자동 전환 데모 (isLoaded)</Typography>
             <div className="bg-surface-sunken p-6 rounded-lg">
@@ -1432,11 +1374,9 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* Real Use Cases */}
           <div className="space-y-4">
             <Typography variant="subtitle">실제 사용 예시</Typography>
 
-            {/* User Profile Card */}
             <div className="space-y-3">
               <Typography
                 variant="caption"
@@ -1449,7 +1389,6 @@ export function DesignSystemDemo() {
               </div>
             </div>
 
-            {/* Blog Card */}
             <div className="space-y-3">
               <Typography
                 variant="caption"
@@ -1464,7 +1403,6 @@ export function DesignSystemDemo() {
           </div>
         </section>
 
-        {/* Chat Bubble Section */}
         <section className="space-y-6">
           <Typography
             variant="hero"
@@ -1473,7 +1411,6 @@ export function DesignSystemDemo() {
             Chat Bubbles
           </Typography>
 
-          {/* Basic Variants */}
           <div className="space-y-4">
             <Typography variant="subtitle">Variants</Typography>
             <div className="space-y-3 bg-surface-sunken p-6 rounded-lg">
@@ -1489,7 +1426,6 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* Sizes */}
           <div className="space-y-4">
             <Typography variant="subtitle">Sizes</Typography>
             <div className="space-y-3 bg-surface-sunken p-6 rounded-lg">
@@ -1505,7 +1441,6 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* With Avatar */}
           <div className="space-y-4">
             <Typography variant="subtitle">With Avatar</Typography>
             <div className="space-y-3 bg-surface-sunken p-6 rounded-lg">
@@ -1529,7 +1464,6 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* With Timestamp */}
           <div className="space-y-4">
             <Typography variant="subtitle">With Timestamp</Typography>
             <div className="space-y-3 bg-surface-sunken p-6 rounded-lg">
@@ -1549,11 +1483,9 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* Typing Indicator */}
           <div className="space-y-4">
             <Typography variant="subtitle">Typing Indicator</Typography>
 
-            {/* Standalone Typing Indicators */}
             <div className="space-y-3">
               <Typography
                 variant="caption"
@@ -1592,7 +1524,6 @@ export function DesignSystemDemo() {
               </div>
             </div>
 
-            {/* In Chat Bubbles */}
             <div className="space-y-3">
               <Typography
                 variant="caption"
@@ -1618,7 +1549,6 @@ export function DesignSystemDemo() {
               </div>
             </div>
 
-            {/* Typing to Text Transition */}
             <div className="space-y-3">
               <Typography
                 variant="caption"
@@ -1631,7 +1561,6 @@ export function DesignSystemDemo() {
               </div>
             </div>
 
-            {/* Typewriter Effect */}
             <div className="space-y-3">
               <Typography
                 variant="caption"
@@ -1645,7 +1574,6 @@ export function DesignSystemDemo() {
             </div>
           </div>
 
-          {/* Chat Conversation Example */}
           <div className="space-y-4">
             <Typography variant="subtitle">채팅 대화 예시</Typography>
             <div className="bg-surface-sunken p-6 rounded-lg max-w-2xl">
@@ -1684,7 +1612,6 @@ export function DesignSystemDemo() {
         </section>
       </main>
 
-      {/* Footer */}
       <footer className="border-t border-border-default bg-surface-sunken mt-16">
         <div className="max-w-7xl mx-auto px-6 py-8 text-center">
           <Typography

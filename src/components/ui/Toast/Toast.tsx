@@ -1,14 +1,45 @@
+import type { VariantProps } from 'class-variance-authority'
+
+import { cva } from 'class-variance-authority'
 import {
   useCallback,
   useEffect,
   useState,
 } from 'react'
 
-import { IconButton } from '@/components/ui/IconButton/IconButton'
-import { Typography } from '@/components/ui/Typography/Typography'
+import { IconButton } from '@/components/ui/icon-button'
+import { Typography } from '@/components/ui/typography'
 import { cn } from '@/lib/utils'
 
 import type { ToastProps } from './types'
+
+const toastVariants = cva(
+  [
+    'relative min-w-[300px] max-w-[500px] rounded-lg border shadow-lg',
+    'transition-opacity duration-200',
+  ],
+  {
+    variants: {
+      variant: {
+        success: 'bg-bg-success border-border-success typography-text-success',
+        error: 'bg-bg-error border-border-error typography-text-error',
+        warning: 'bg-bg-warning border-border-warning typography-text-warning',
+        info: 'bg-bg-info border-border-info typography-text-info',
+        default: 'bg-surface-raised border-border-default typography-text-primary',
+      },
+      visible: {
+        true: 'opacity-100',
+        false: 'opacity-0',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      visible: false,
+    },
+  },
+)
+
+export type ToastVariants = VariantProps<typeof toastVariants>
 
 export function Toast({
   message,
@@ -22,22 +53,18 @@ export function Toast({
 }: ToastProps) {
   const [isVisible, setIsVisible] = useState(false)
 
-  // Fade-in 애니메이션
   const handleClose = useCallback(() => {
     setIsVisible(false)
-    // 애니메이션 완료 후 onClose 호출
     setTimeout(() => {
       onClose?.()
-    }, 200) // transition duration과 일치
+    }, 200)
   }, [onClose])
 
   useEffect(() => {
-    // 마운트 직후 visible 설정 (애니메이션 트리거)
     const timer = setTimeout(() => setIsVisible(true), 10)
     return () => clearTimeout(timer)
   }, [])
 
-  // Auto-dismiss 타이머
   useEffect(() => {
     if (duration <= 0)
       return
@@ -49,29 +76,8 @@ export function Toast({
     return () => clearTimeout(dismissTimer)
   }, [duration, handleClose])
 
-  // Variant별 스타일
-  const variantClasses = {
-    success: 'bg-success-bg border-success-border text-success-text',
-    error: 'bg-error-bg border-error-border text-error-text',
-    warning: 'bg-warning-bg border-warning-border text-warning-text',
-    info: 'bg-info-bg border-info-border text-info-text',
-    default: 'bg-surface-raised border-border-default text-body',
-  }
-
   return (
-    <div
-      className={cn(
-        // 기본 스타일
-        'relative min-w-[300px] max-w-[500px] rounded-lg border shadow-lg',
-        'transition-opacity duration-200',
-        // Variant 스타일
-        variantClasses[variant],
-        // 애니메이션
-        isVisible ? 'opacity-100' : 'opacity-0',
-        className,
-      )}
-    >
-      {/* 메인 콘텐츠 */}
+    <div className={cn(toastVariants({ variant, visible: isVisible }), className)}>
       <div className="p-4 pr-10">
         {children || (
           <Typography
@@ -83,7 +89,6 @@ export function Toast({
         )}
       </div>
 
-      {/* Progress bar */}
       {showProgress && (
         <div className="h-1 bg-black/10 dark:bg-white/10 rounded-b-lg overflow-hidden">
           <div
@@ -93,7 +98,6 @@ export function Toast({
         </div>
       )}
 
-      {/* Close 버튼 */}
       {showClose && (
         <IconButton
           size="sm"

@@ -97,6 +97,8 @@ export default antfu(
         },
       ],
 
+      'style/multiline-ternary': 0,
+
       // React JSX props formatting (2+ props)
       'style/jsx-max-props-per-line': [
         'error',

@@ -1,10 +1,4 @@
 /**
- * API Client
- *
- * 백엔드 서버와의 HTTP 통신을 담당하는 클라이언트
- */
-
-/**
  * API 에러 클래스
  */
 export class ApiError extends Error {
@@ -143,7 +137,6 @@ class ApiClient {
     data?: unknown,
   ): Promise<T> {
     try {
-      // baseURL이 비어있으면 상대 경로로 요청 (Mirage.js에서 인터셉트)
       const requestUrl = this.buildUrl(url)
 
       const response = await this.fetchWithTimeout(requestUrl, {
@@ -190,9 +183,6 @@ class ApiClient {
   }
 }
 
-/**
- * API Client 싱글톤 인스턴스
- */
 export const apiClient = new ApiClient({
   baseURL: import.meta.env.VITE_API_URL || '',
   timeout: 30000, // 30초

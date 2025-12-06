@@ -1,6 +1,6 @@
-export { Toast } from './Toast'
-export { ToastContainer } from './ToastContainer'
-export { ToastProvider, useToastContext } from './ToastContext'
+export { Toast } from './toast'
+export { ToastContainer } from './toast-container'
+export { ToastProvider, useToastContext } from './toast-context'
 export type {
   ToastOptions,
   ToastPosition,
