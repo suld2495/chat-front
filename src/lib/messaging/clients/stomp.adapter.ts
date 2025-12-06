@@ -122,9 +122,10 @@ export class StompAdapter implements MessagingClient {
       body = {
         id: crypto.randomUUID(),
         content: frame.body,
-        sender: 'agent',
-        timestamp: new Date(),
-        type: 'text',
+        sender: { id: 'agent' },
+        createdAt: '',
+        messageType: 'TEXT',
+        senderId: '',
       }
     }
 

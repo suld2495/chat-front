@@ -15,7 +15,6 @@ const wsEndpoint = import.meta.env.VITE_WS_ENDPOINT || 'http://localhost:8080/ws
 // 사용자 및 에이전트 senderId 상수
 const USER_SENDER_ID = 'a151e11d-afaa-41cd-96c6-e86407a7de3d'
 const AGENT_SENDER_ID = '0f059a1a-fac5-42b7-bd8d-bf1d2c6a1452'
-const LOADING_CHAT_ROOM_ID = '0e67fb87-10d3-4256-a887-443fe8583243'
 
 export function useChatConnection() {
   const isConnected = useChatStore(state => state.isConnected)
