@@ -30,7 +30,7 @@ export interface Message {
  * MessageSendRequest 타입과 호환
  */
 export interface SenderMessage {
-  conversationId: string
+  conversationId?: string
   content?: string
   messageType?: MessageType
   fileInfo?: FileInfo

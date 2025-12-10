@@ -1,9 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import type { Message } from '@/services/chat/types'
 
@@ -60,12 +55,15 @@ export function useChatConnection() {
     if (isConnected && !conversationId) {
       // 초기화 메시지 전송
       init(
-        'HOSP001', // TODO: 실제 병원 ID로 변경
+        'HOSPITAL001', // TODO: 실제 병원 ID로 변경
         getOrCreateVisitorId(), // 방문자 ID (브라우저별 고유 ID, localStorage에 저장)
         {
           name: '방문자',
           userAgent: navigator.userAgent,
           referrer: document.referrer,
+        },
+        () => {
+          // 초기화 완료 후 처리 (필요시 추가)
         },
       )
     }
@@ -96,7 +94,11 @@ export function useChatMessages(destination: string) {
 
   // 초기 메시지 로드 (웰컴 메시지 + 최근 메시지)
   useEffect(() => {
-    if (conversationId && !initializedRef.current && (welcomeMessage || recentMessages.length > 0)) {
+    if (
+      conversationId &&
+      !initializedRef.current &&
+      (welcomeMessage || recentMessages.length > 0)
+    ) {
       const initialMessages: Message[] = []
 
       // 웰컴 메시지 추가
@@ -122,10 +124,9 @@ export function useChatMessages(destination: string) {
   }, [conversationId, welcomeMessage, recentMessages])
 
   useEffect(() => {
-    if (!isConnected)
-      return
+    if (!isConnected) return
 
-    subscribe(destination, (message) => {
+    subscribe(destination, message => {
       // 사용자가 메시지를 보낸 경우 → 로딩 메시지 추가
       if (message.senderId === USER_SENDER_ID) {
         const loadingMessage: Message = {
@@ -147,13 +148,13 @@ export function useChatMessages(destination: string) {
       if (message.senderId === AGENT_SENDER_ID && isWaitingForAgentRef.current) {
         isWaitingForAgentRef.current = false
         const animatedMessage: Message = { ...message, animate: true }
-        setMessages((prev) => {
+        setMessages(prev => {
           const lastMessage = prev[prev.length - 1]
           // 마지막 메시지가 로딩 메시지인 경우 제거
           if (
-            lastMessage
-            && lastMessage.senderId === AGENT_SENDER_ID
-            && lastMessage.metadata?.isLoading
+            lastMessage &&
+            lastMessage.senderId === AGENT_SENDER_ID &&
+            lastMessage.metadata?.isLoading
           ) {
             return [...prev.slice(0, -1), animatedMessage]
           }
