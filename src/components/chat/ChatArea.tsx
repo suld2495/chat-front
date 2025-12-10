@@ -21,12 +21,13 @@ const content = `
 검사, 수술, 예약 등 궁금하신 내용을 입력해 주세요.`.trim()
 
 const emptyMessage: Message = {
-  id: '0',
+  messageId: '0',
   content,
-  sender: { id: 'agent' },
+  senderType: 'AGENT',
+  senderId: 'agent',
+  senderName: 'Agent',
   createdAt: '2022-04-05 10:00:00',
   messageType: 'TEXT',
-  senderId: '',
 }
 
 export function ChatArea({ messages }: ChatAreaProps) {
@@ -72,7 +73,7 @@ export function ChatArea({ messages }: ChatAreaProps) {
             <div className="flex flex-col gap-4">
               {messages.map(message => (
                 <ChatMessage
-                  key={message.id}
+                  key={message.messageId}
                   message={message}
                   animate={message.animate}
                   onAnimationTick={message.animate ? scrollToBottom : undefined}

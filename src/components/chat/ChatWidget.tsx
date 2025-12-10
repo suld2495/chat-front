@@ -1,31 +1,24 @@
 import { useState } from 'react'
 
-import type { SenderMessage } from '@/services/chat/types'
-
 import {
   useChatConnection,
   useChatMessages,
-  useChatPublish,
 } from '@/hooks/useChat'
 import { cn } from '@/lib/utils'
+import { useChatStore } from '@/stores/chat'
 
 import { ChatArea } from './ChatArea'
-import { ChatAreaSkelton } from './ChatAreaSkelton'
 import { ChatHeader } from './ChatHeader'
 import { ChatInput } from './ChatInput'
 import { ChatWidgetButton } from './ChatWidgetButton'
 
 const destination = import.meta.env.VITE_WS_DESTINATION
-const publishDestination = import.meta.env.VITE_WS_PUBLISH_DESTINATION
 
 export function ChatWidget() {
   useChatConnection()
-  const {
-    loading,
-    messages,
-    clearMessages,
-  } = useChatMessages(destination)
-  const { isConnected, publish } = useChatPublish()
+  const { messages, clearMessages } = useChatMessages(destination)
+  const isConnected = useChatStore(state => state.isConnected)
+  const sendMessage = useChatStore(state => state.sendMessage)
   const [isOpen, setIsOpen] = useState(false)
 
   const handleToggle = () => {
@@ -36,32 +29,20 @@ export function ChatWidget() {
     if (!isConnected)
       return
 
-    const newMessage: SenderMessage = {
-      chatRoomId: '0e67fb87-10d3-4256-a887-443fe8583243', // TODO: 실제 채팅방 ID로 교체
-      senderId: 'a151e11d-afaa-41cd-96c6-e86407a7de3d',
-      content,
-      messageType: 'TEXT',
-      chatMessageType: 'CHAT',
-    }
-
-    publish(publishDestination, newMessage)
+    sendMessage(content, 'TEXT')
   }
 
   const handleSendFile = (file: File) => {
     if (!isConnected)
       return
 
-    const newMessage: SenderMessage = {
-      id: crypto.randomUUID(),
-      chatRoomId: '0e67fb87-10d3-4256-a887-443fe8583243', // TODO: 실제 채팅방 ID로 교체
-      senderId: 'a151e11d-afaa-41cd-96c6-e86407a7de3d',
-      content: file.name,
-      messageType: 'FILE',
-      chatMessageType: 'CHAT',
-      createdAt: new Date().toISOString(),
-    }
-
-    publish(publishDestination, newMessage)
+    sendMessage(file.name, 'FILE', {
+      fileId: crypto.randomUUID(),
+      fileName: file.name,
+      fileUrl: '', // TODO: 파일 업로드 후 URL 설정
+      fileSize: file.size,
+      mimeType: file.type,
+    })
   }
 
   return (
@@ -84,7 +65,7 @@ export function ChatWidget() {
           onClose={handleToggle}
           onClear={clearMessages}
         />
-        {loading ? <ChatAreaSkelton /> : <ChatArea messages={messages} />}
+        <ChatArea messages={messages} />
 
         <ChatInput
           onSendMessage={handleSendMessage}

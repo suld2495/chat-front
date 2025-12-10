@@ -7,67 +7,136 @@ import {
 
 import type { Message } from '@/services/chat/types'
 
-import { fetchChatMessages } from '@/api/chat'
 import { useChatStore } from '@/stores/chat'
 
-const wsEndpoint = import.meta.env.VITE_WS_ENDPOINT || 'http://localhost:8080/ws'
+const wsEndpoint = import.meta.env.VITE_WS_ENDPOINT || 'http://localhost:8080/ws/widget'
 
 // 사용자 및 에이전트 senderId 상수
 const USER_SENDER_ID = 'a151e11d-afaa-41cd-96c6-e86407a7de3d'
 const AGENT_SENDER_ID = '0f059a1a-fac5-42b7-bd8d-bf1d2c6a1452'
 
+// LocalStorage 키 상수
+const VISITOR_ID_KEY = 'talkcrm_visitor_id'
+
+/**
+ * 방문자 ID 가져오기 (없으면 생성)
+ */
+function getOrCreateVisitorId(): string {
+  const stored = localStorage.getItem(VISITOR_ID_KEY)
+  if (stored) {
+    console.log('[VisitorId] Using existing visitor ID:', stored)
+    return stored
+  }
+
+  const newId = crypto.randomUUID()
+  localStorage.setItem(VISITOR_ID_KEY, newId)
+  console.log('[VisitorId] Created new visitor ID:', newId)
+  return newId
+}
+
+/**
+ * WebSocket 연결 관리 훅
+ */
 export function useChatConnection() {
   const isConnected = useChatStore(state => state.isConnected)
+  const conversationId = useChatStore(state => state.conversationId)
   const error = useChatStore(state => state.error)
   const connect = useChatStore(state => state.connect)
   const disconnect = useChatStore(state => state.disconnect)
+  const init = useChatStore(state => state.init)
 
   useEffect(() => {
-    connect(wsEndpoint)
+    // 이미 연결되어 있으면 재연결하지 않음
+    if (!isConnected) {
+      connect(wsEndpoint)
+    }
 
     return () => {
       disconnect()
     }
-  }, [connect, disconnect])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // 빈 배열로 한 번만 실행
+
+  // WebSocket 연결 성공 시 초기화 (conversationId 발급)
+  useEffect(() => {
+    if (isConnected && !conversationId) {
+      console.log('[useChatConnection] Initializing conversation...')
+
+      // 초기화 메시지 전송
+      init(
+        'HOSP001', // TODO: 실제 병원 ID로 변경
+        getOrCreateVisitorId(), // 방문자 ID (브라우저별 고유 ID, localStorage에 저장)
+        {
+          name: '방문자',
+          userAgent: navigator.userAgent,
+          referrer: document.referrer,
+        },
+        (data) => {
+          console.log('[useChatConnection] Initialization complete:', {
+            conversationId: data.conversationId,
+            welcomeMessage: data.welcomeMessage,
+            aiEnabled: data.aiEnabled,
+            recentMessagesCount: data.recentMessages.length,
+          })
+        },
+      )
+    }
+  }, [isConnected, conversationId, init])
 
   return {
     isConnected,
+    conversationId,
     error,
   }
 }
 
+/**
+ * 채팅 메시지 관리 훅
+ * WebSocket 메시지 수신 및 상태 관리
+ */
 export function useChatMessages(destination: string) {
-  const [loading, setLoading] = useState(true)
   const [messages, setMessages] = useState<Message[]>([])
   const isWaitingForAgentRef = useRef(false)
+  const initializedRef = useRef(false)
 
   const isConnected = useChatStore(state => state.isConnected)
+  const conversationId = useChatStore(state => state.conversationId)
+  const recentMessages = useChatStore(state => state.recentMessages)
+  const welcomeMessage = useChatStore(state => state.welcomeMessage)
   const subscribe = useChatStore(state => state.subscribe)
   const unsubscribe = useChatStore(state => state.unsubscribe)
 
+  // 초기 메시지 로드 (웰컴 메시지 + 최근 메시지)
   useEffect(() => {
-    const getChatMessages = async () => {
-      try {
-        if (messages.length > 0) {
-          setLoading(false)
-          return
-        }
+    if (conversationId && !initializedRef.current && (welcomeMessage || recentMessages.length > 0)) {
+      console.log('[useChatMessages] Loading initial messages:', {
+        welcomeMessage,
+        recentMessagesCount: recentMessages.length,
+      })
 
-        const { content } = await fetchChatMessages()
+      const initialMessages: Message[] = []
 
-        // HTTP 로드 시 애니메이션 없음 (animate 플래그 없음)
-        setMessages(content)
+      // 웰컴 메시지 추가
+      if (welcomeMessage) {
+        initialMessages.push({
+          messageId: `welcome-${Date.now()}`,
+          conversationId,
+          content: welcomeMessage,
+          senderType: 'AGENT',
+          senderId: AGENT_SENDER_ID,
+          senderName: 'Agent',
+          createdAt: new Date().toISOString(),
+          messageType: 'SYSTEM',
+        })
       }
-      catch {
 
-      }
-      finally {
-        setLoading(false)
-      }
+      // 최근 메시지 추가
+      initialMessages.push(...recentMessages)
+
+      setMessages(initialMessages)
+      initializedRef.current = true
     }
-
-    getChatMessages()
-  }, [])
+  }, [conversationId, welcomeMessage, recentMessages])
 
   useEffect(() => {
     if (!isConnected)
@@ -77,12 +146,14 @@ export function useChatMessages(destination: string) {
       // 사용자가 메시지를 보낸 경우 → 로딩 메시지 추가
       if (message.senderId === USER_SENDER_ID) {
         const loadingMessage: Message = {
-          id: `loading-${Date.now()}`,
+          messageId: `loading-${Date.now()}`,
           content: '',
-          sender: { id: 'agent' },
+          senderType: 'AGENT',
           senderId: AGENT_SENDER_ID,
+          senderName: 'Agent',
           createdAt: new Date().toISOString(),
-          messageType: 'LOADING',
+          messageType: 'SYSTEM', // LOADING 대신 SYSTEM 사용
+          metadata: { isLoading: true },
         }
         isWaitingForAgentRef.current = true
         setMessages(prev => [...prev, message, loadingMessage])
@@ -95,11 +166,11 @@ export function useChatMessages(destination: string) {
         const animatedMessage: Message = { ...message, animate: true }
         setMessages((prev) => {
           const lastMessage = prev[prev.length - 1]
-          // 마지막 메시지가 에이전트의 LOADING 메시지인 경우 제거
+          // 마지막 메시지가 로딩 메시지인 경우 제거
           if (
             lastMessage
             && lastMessage.senderId === AGENT_SENDER_ID
-            && lastMessage.messageType === 'LOADING'
+            && lastMessage.metadata?.isLoading
           ) {
             return [...prev.slice(0, -1), animatedMessage]
           }
@@ -119,19 +190,11 @@ export function useChatMessages(destination: string) {
 
   const clearMessages = useCallback(() => {
     setMessages([])
+    initializedRef.current = false
   }, [])
 
   return {
-    loading,
     messages,
     clearMessages,
   }
-}
-
-// 메시지 전송만
-export function useChatPublish() {
-  const isConnected = useChatStore(state => state.isConnected)
-  const publish = useChatStore(state => state.publish)
-
-  return { isConnected, publish }
 }

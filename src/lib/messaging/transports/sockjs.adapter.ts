@@ -10,17 +10,21 @@ export class SockJSTransport implements Transport {
   private errorCallback?: (error: Error) => void
 
   connect(url: string): WebSocket {
+    console.log('[SockJS] Connecting to:', url)
     this.socket = new SockJS(url)
 
     this.socket.onopen = () => {
+      console.log('[SockJS] Connection opened')
       this.connectCallback?.()
     }
 
-    this.socket.onclose = () => {
+    this.socket.onclose = (event) => {
+      console.log('[SockJS] Connection closed:', event)
       this.disconnectCallback?.()
     }
 
-    this.socket.onerror = () => {
+    this.socket.onerror = (event) => {
+      console.error('[SockJS] Connection error:', event)
       this.errorCallback?.(new Error('SockJS connection error'))
     }
 

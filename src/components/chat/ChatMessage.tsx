@@ -98,7 +98,7 @@ function LoadingMessage() {
 
 interface FileMessageProps {
   isUser: boolean
-  message: Pick<Message, 'fileName'>
+  message: Pick<Message, 'fileInfo'>
 }
 
 function FileMessage({ isUser, message }: FileMessageProps) {
@@ -122,7 +122,7 @@ function FileMessage({ isUser, message }: FileMessageProps) {
       </div>
       <div className="flex-1 min-w-0">
         <Typography className="text-sm font-medium truncate">
-          {message.fileName || 'File'}
+          {message.fileInfo?.fileName || 'File'}
         </Typography>
         <Typography
           className={cn(
@@ -149,8 +149,7 @@ export function ChatMessage({
   animate = false,
   onAnimationTick,
 }: ChatMessageProps) {
-  // TODO
-  const isUser = (message?.sender?.id || message?.senderId) === 'a151e11d-afaa-41cd-96c6-e86407a7de3d'
+  const isUser = message.senderType === 'USER' || message.senderId === 'a151e11d-afaa-41cd-96c6-e86407a7de3d'
 
   const formatTime = (date: string) => {
     return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -195,7 +194,7 @@ export function ChatMessage({
           />
         )}
 
-        {message.messageType === 'LOADING' && (
+        {!!message.metadata?.isLoading && (
           <LoadingMessage />
         )}
 
