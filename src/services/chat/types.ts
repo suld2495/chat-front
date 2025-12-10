@@ -31,7 +31,7 @@ export interface Message {
  */
 export interface SenderMessage {
   conversationId: string
-  content: string
+  content?: string
   messageType?: MessageType
   fileInfo?: FileInfo
 }

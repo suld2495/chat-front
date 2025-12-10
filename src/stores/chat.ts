@@ -7,7 +7,6 @@ import type {
   MessagingPayload,
   Subscription,
 } from '@/lib/messaging/clients/types'
-import type { Message, SenderMessage } from '@/services/chat/types'
 import type {
   CloseRequest,
   ConnectedMessage,
@@ -18,6 +17,7 @@ import type {
   VisitorInfo,
   WebSocketMessage,
 } from '@/lib/websocket/types'
+import type { Message, SenderMessage } from '@/services/chat/types'
 
 import { StompAdapter } from '@/lib/messaging/clients/stomp.adapter'
 import { SockJSTransport } from '@/lib/messaging/transports/sockjs.adapter'
@@ -69,25 +69,21 @@ export const useChatStore = create<ChatState>((set, get) => ({
     const { client: existingClient } = get()
 
     if (existingClient) {
-      console.log('[ChatStore] Client already exists, skipping connection')
       return
     }
 
-    console.log('[ChatStore] Creating new WebSocket connection to:', url)
     const transport = new SockJSTransport()
     const client = new StompAdapter(transport)
 
     client.onConnect(() => {
-      console.log('[ChatStore] Connection established')
       set({ isConnected: true, error: null })
     })
 
     client.onDisconnect(() => {
-      console.log('[ChatStore] Disconnected')
       set({ isConnected: false })
     })
 
-    client.onError(error => {
+    client.onError((error) => {
       console.error('[ChatStore] Error occurred:', error)
       set({ error })
     })
@@ -147,13 +143,12 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
         // 대화 채널 구독
         const conversationChannel = CHANNELS.CONVERSATION(connectedData.conversationId)
-        get().subscribe(conversationChannel, msg => {
+        get().subscribe(conversationChannel, (msg) => {
           // 메시지는 외부에서 처리하도록 콜백 전달
-          console.log('Message received:', msg)
         })
 
         // 에러 채널 구독
-        get().subscribe(CHANNELS.ERROR, errorMsg => {
+        get().subscribe(CHANNELS.ERROR, (errorMsg) => {
           console.error('Error received:', errorMsg)
         })
 
@@ -174,10 +169,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
   },
 
   subscribe: (destination: string, callback: (message: Message) => void) => {
-    const { client, isConnected, subscriptions } = get()
-    if (!client || !isConnected) return
+    const {
+      client,
+      isConnected,
+      subscriptions,
+    } = get()
+    if (!client || !isConnected)
+      return
 
-    if (subscriptions.has(destination)) return
+    if (subscriptions.has(destination))
+      return
 
     const subscription = client.subscribe(destination, (message: MessagingPayload) => {
       callback(message.body)
@@ -207,7 +208,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
    * WebSocket API 명세: /app/widget/message
    */
   sendMessage: (content, messageType = 'TEXT', fileInfo) => {
-    const { client, isConnected, conversationId } = get()
+    const {
+      client,
+      isConnected,
+      conversationId,
+    } = get()
 
     if (!client || !isConnected) {
       console.error('Client is not connected')
@@ -233,10 +238,15 @@ export const useChatStore = create<ChatState>((set, get) => ({
    * 타이핑 상태 전송
    * WebSocket API 명세: /app/widget/typing
    */
-  sendTyping: isTyping => {
-    const { client, isConnected, conversationId } = get()
+  sendTyping: (isTyping) => {
+    const {
+      client,
+      isConnected,
+      conversationId,
+    } = get()
 
-    if (!client || !isConnected || !conversationId) return
+    if (!client || !isConnected || !conversationId)
+      return
 
     const typingRequest: TypingRequest = {
       conversationId,
@@ -250,10 +260,15 @@ export const useChatStore = create<ChatState>((set, get) => ({
    * 읽음 처리
    * WebSocket API 명세: /app/widget/read
    */
-  markAsRead: messageId => {
-    const { client, isConnected, conversationId } = get()
+  markAsRead: (messageId) => {
+    const {
+      client,
+      isConnected,
+      conversationId,
+    } = get()
 
-    if (!client || !isConnected || !conversationId) return
+    if (!client || !isConnected || !conversationId)
+      return
 
     const readRequest: ReadRequest = {
       conversationId,
@@ -267,10 +282,15 @@ export const useChatStore = create<ChatState>((set, get) => ({
    * 대화 종료
    * WebSocket API 명세: /app/widget/close
    */
-  closeConversation: reason => {
-    const { client, isConnected, conversationId } = get()
+  closeConversation: (reason) => {
+    const {
+      client,
+      isConnected,
+      conversationId,
+    } = get()
 
-    if (!client || !isConnected || !conversationId) return
+    if (!client || !isConnected || !conversationId)
+      return
 
     const closeRequest: CloseRequest = {
       conversationId,

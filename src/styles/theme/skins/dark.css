@@ -139,15 +139,15 @@
   /* ============================================
      Chat Widget Specific
    ============================================ */
-   --color-chat-bg: var(--color-surface);
-   --color-chat-widget: var(--color-chat-bg);
-   --color-chat-header: var(--color-primary);
-   --color-chat-header-fg: var(--color-text-inverse);
-   --color-chat-bubble-user: var(--color-primary);
-   --color-chat-bubble-user-fg: var(--color-text-inverse);
-   --color-chat-bubble-other: var(--color-surface-sunken);
-   --color-chat-bubble-other-fg: var(--color-text-primary);
-   --color-chat-input: var(--color-chat-bg);;
-   --color-chat-timestamp: var(--color-text-tertiary);
-   --color-muted-foreground: var(--color-text-inverse);
+  --color-chat-bg: var(--color-surface);
+  --color-chat-widget: var(--color-chat-bg);
+  --color-chat-header: var(--color-primary);
+  --color-chat-header-fg: var(--color-text-inverse);
+  --color-chat-bubble-user: var(--color-primary);
+  --color-chat-bubble-user-fg: var(--color-text-inverse);
+  --color-chat-bubble-other: var(--color-surface-sunken);
+  --color-chat-bubble-other-fg: var(--color-text-primary);
+  --color-chat-input: var(--color-chat-bg);
+  --color-chat-timestamp: var(--color-text-tertiary);
+  --color-muted-foreground: var(--color-text-inverse);
 }

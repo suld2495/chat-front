@@ -13,12 +13,12 @@ export type SenderType = 'USER' | 'AGENT' | 'AI' | 'SYSTEM'
 /**
  * WebSocket 메시지 타입 (서버 → 클라이언트)
  */
-export type WebSocketMessageType =
-  | 'connected'
-  | 'message'
-  | 'typing'
-  | 'conversation_closed'
-  | 'error'
+export type WebSocketMessageType
+  = | 'connected'
+    | 'message'
+    | 'typing'
+    | 'conversation_closed'
+    | 'error'
 
 /**
  * 파일 정보
@@ -176,12 +176,12 @@ export interface ErrorResponse {
 /**
  * WebSocket 메시지 통합 타입
  */
-export type WebSocketMessage =
-  | ConnectedMessage
-  | MessageReceived
-  | TypingStatus
-  | ConversationClosed
-  | ErrorResponse
+export type WebSocketMessage
+  = | ConnectedMessage
+    | MessageReceived
+    | TypingStatus
+    | ConversationClosed
+    | ErrorResponse
 
 // ============================================
 // WebSocket 엔드포인트 상수

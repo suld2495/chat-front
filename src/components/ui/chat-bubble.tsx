@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react'
 
 import { cn } from '@/lib/utils'
 
-import { Typography } from './typography'
 import { TypingIndicator } from './typing-indicator'
+import { Typography } from './typography'
 
 const chatBubbleVariants = cva('rounded-l w-fit max-w-prose', {
   variants: {

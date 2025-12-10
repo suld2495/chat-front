@@ -24,13 +24,11 @@ const VISITOR_ID_KEY = 'talkcrm_visitor_id'
 function getOrCreateVisitorId(): string {
   const stored = localStorage.getItem(VISITOR_ID_KEY)
   if (stored) {
-    console.log('[VisitorId] Using existing visitor ID:', stored)
     return stored
   }
 
   const newId = crypto.randomUUID()
   localStorage.setItem(VISITOR_ID_KEY, newId)
-  console.log('[VisitorId] Created new visitor ID:', newId)
   return newId
 }
 
@@ -60,8 +58,6 @@ export function useChatConnection() {
   // WebSocket 연결 성공 시 초기화 (conversationId 발급)
   useEffect(() => {
     if (isConnected && !conversationId) {
-      console.log('[useChatConnection] Initializing conversation...')
-
       // 초기화 메시지 전송
       init(
         'HOSP001', // TODO: 실제 병원 ID로 변경
@@ -70,14 +66,6 @@ export function useChatConnection() {
           name: '방문자',
           userAgent: navigator.userAgent,
           referrer: document.referrer,
-        },
-        (data) => {
-          console.log('[useChatConnection] Initialization complete:', {
-            conversationId: data.conversationId,
-            welcomeMessage: data.welcomeMessage,
-            aiEnabled: data.aiEnabled,
-            recentMessagesCount: data.recentMessages.length,
-          })
         },
       )
     }
@@ -109,11 +97,6 @@ export function useChatMessages(destination: string) {
   // 초기 메시지 로드 (웰컴 메시지 + 최근 메시지)
   useEffect(() => {
     if (conversationId && !initializedRef.current && (welcomeMessage || recentMessages.length > 0)) {
-      console.log('[useChatMessages] Loading initial messages:', {
-        welcomeMessage,
-        recentMessagesCount: recentMessages.length,
-      })
-
       const initialMessages: Message[] = []
 
       // 웰컴 메시지 추가

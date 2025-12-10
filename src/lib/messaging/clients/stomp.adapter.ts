@@ -43,13 +43,7 @@ export class StompAdapter implements MessagingClient {
       heartbeatIncoming: options.heartbeat?.incoming ?? 10000,
       heartbeatOutgoing: options.heartbeat?.outgoing ?? 10000,
 
-      // 디버그 로깅 활성화
-      debug: (str) => {
-        console.log('[STOMP Debug]:', str)
-      },
-
       onConnect: () => {
-        console.log('[STOMP] Connected successfully')
         this.connectCallback?.()
       },
 
@@ -59,7 +53,6 @@ export class StompAdapter implements MessagingClient {
       },
 
       onDisconnect: () => {
-        console.log('[STOMP] Disconnected')
         this.disconnectCallback?.()
       },
 
@@ -67,13 +60,8 @@ export class StompAdapter implements MessagingClient {
         console.error('[STOMP] WebSocket error:', event)
         this.errorCallback?.(new Error('WebSocket Error'))
       },
-
-      onWebSocketClose: (event) => {
-        console.log('[STOMP] WebSocket closed:', event.code, event.reason)
-      },
     })
 
-    console.log('[STOMP] Activating client...')
     this.client?.activate()
   }
 

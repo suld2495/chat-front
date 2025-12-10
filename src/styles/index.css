@@ -20,7 +20,7 @@
 @import './theme/skins/dark.css';
 
 @utility typography-* {
- color: --value(--color-*);
+  color: --value(--color-*);
 }
 
 /* Custom Animations */
