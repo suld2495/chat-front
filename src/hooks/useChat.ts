@@ -91,6 +91,7 @@ export function useChatMessages(destination: string) {
   const welcomeMessage = useChatStore(state => state.welcomeMessage)
   const subscribe = useChatStore(state => state.subscribe)
   const unsubscribe = useChatStore(state => state.unsubscribe)
+  const sendMessageStore = useChatStore(state => state.sendMessage)
 
   // 초기 메시지 로드 (웰컴 메시지 + 최근 메시지)
   useEffect(() => {
@@ -127,8 +128,30 @@ export function useChatMessages(destination: string) {
     if (!isConnected) return
 
     subscribe(destination, message => {
-      // 사용자가 메시지를 보낸 경우 → 로딩 메시지 추가
+      // 사용자가 메시지를 보낸 경우 (서버로부터 브로드캐스트 수신)
       if (message.senderId === USER_SENDER_ID) {
+        // 임시 메시지를 실제 메시지로 교체
+        setMessages(prev => {
+          // 임시 메시지 찾기
+          const tempMessageIndex = prev.findIndex(
+            msg => msg.tempMessageId && msg.senderId === USER_SENDER_ID && msg.messageId.startsWith('temp-')
+          )
+
+          if (tempMessageIndex !== -1) {
+            // 임시 메시지를 실제 메시지로 교체
+            const updated = [...prev]
+            updated[tempMessageIndex] = {
+              ...message,
+              tempMessageId: undefined, // 임시 ID 제거
+            }
+            return updated
+          }
+
+          // 임시 메시지가 없으면 일반 추가 (다른 디바이스에서 보낸 경우)
+          return [...prev, message]
+        })
+
+        // 로딩 메시지 추가 (에이전트 응답 대기)
         const loadingMessage: Message = {
           messageId: `loading-${Date.now()}`,
           content: '',
@@ -136,11 +159,11 @@ export function useChatMessages(destination: string) {
           senderId: AGENT_SENDER_ID,
           senderName: 'Agent',
           createdAt: new Date().toISOString(),
-          messageType: 'SYSTEM', // LOADING 대신 SYSTEM 사용
+          messageType: 'SYSTEM',
           metadata: { isLoading: true },
         }
         isWaitingForAgentRef.current = true
-        setMessages(prev => [...prev, message, loadingMessage])
+        setMessages(prev => [...prev, loadingMessage])
         return
       }
 
@@ -177,8 +200,43 @@ export function useChatMessages(destination: string) {
     initializedRef.current = false
   }, [])
 
+  /**
+   * 낙관적 업데이트를 포함한 메시지 전송 함수
+   */
+  const sendMessage = useCallback((
+    content: string,
+    messageType: 'TEXT' | 'IMAGE' | 'FILE' = 'TEXT',
+    fileInfo?: Message['fileInfo']
+  ) => {
+    if (!conversationId) {
+      console.error('Conversation ID is not set')
+      return
+    }
+
+    // 1. 낙관적 업데이트: 즉시 UI에 메시지 추가
+    const tempMessageId = `temp-${Date.now()}`
+    const optimisticMessage: Message = {
+      messageId: tempMessageId, // 임시 ID
+      tempMessageId, // 나중에 찾기 위한 임시 ID 저장
+      conversationId,
+      content,
+      messageType,
+      senderType: 'USER',
+      senderId: USER_SENDER_ID,
+      senderName: 'User',
+      createdAt: new Date().toISOString(),
+      fileInfo,
+    }
+
+    setMessages(prev => [...prev, optimisticMessage])
+
+    // 2. 실제 메시지 전송
+    sendMessageStore(content, messageType, fileInfo)
+  }, [conversationId, sendMessageStore])
+
   return {
     messages,
     clearMessages,
+    sendMessage,
   }
 }

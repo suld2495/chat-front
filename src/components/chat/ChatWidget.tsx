@@ -16,9 +16,8 @@ const destination = import.meta.env.VITE_WS_DESTINATION
 
 export function ChatWidget() {
   useChatConnection()
-  const { messages, clearMessages } = useChatMessages(destination)
+  const { messages, clearMessages, sendMessage } = useChatMessages(destination)
   const isConnected = useChatStore(state => state.isConnected)
-  const sendMessage = useChatStore(state => state.sendMessage)
   const [isOpen, setIsOpen] = useState(false)
 
   const handleToggle = () => {

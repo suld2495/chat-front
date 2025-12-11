@@ -23,6 +23,7 @@ export interface Message {
   // UI 전용 필드
   avatar?: string
   animate?: boolean
+  tempMessageId?: string // 낙관적 업데이트를 위한 임시 메시지 ID
 }
 
 /**
