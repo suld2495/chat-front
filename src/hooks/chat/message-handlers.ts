@@ -3,7 +3,7 @@ import type { Message, SenderType } from '@/services/chat/types'
 export interface MessageHandlerContext {
   processedIds: Set<string>
   pendingMessages: Map<string, string>
-  pendingTimeouts: Map<string, NodeJS.Timeout>
+  pendingTimeouts: Map<string, ReturnType<typeof setTimeout>>
 }
 
 export type MessageUpdater = (updater: (prev: Message[]) => Message[]) => void
