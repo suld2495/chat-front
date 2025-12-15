@@ -1,24 +1,38 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
-import {
-  useChatConnection,
-  useChatMessages,
-} from '@/hooks/useChat'
+import type { FileInfo } from '@/services/chat/types'
+
+import { useChatConnection, useChatMessages } from '@/hooks/chat'
+import { apiUrl } from '@/lib/const'
 import { cn } from '@/lib/utils'
 import { useChatStore } from '@/stores/chat'
 
 import { ChatArea } from './ChatArea'
+import { ChatAreaSkelton } from './ChatAreaSkelton'
 import { ChatHeader } from './ChatHeader'
-import { ChatInput } from './ChatInput'
+import { ChatInputContainer } from './ChatInputContainer'
 import { ChatWidgetButton } from './ChatWidgetButton'
-
-const destination = import.meta.env.VITE_WS_DESTINATION
+import { ConnectionError } from './ConnectionError'
 
 export function ChatWidget() {
-  useChatConnection()
-  const { messages, clearMessages, sendMessage } = useChatMessages(destination)
+  const { error } = useChatConnection()
+  const {
+    loading,
+    messages,
+    sendMessage,
+    clearMessages,
+    retryMessage,
+  } = useChatMessages()
   const isConnected = useChatStore(state => state.isConnected)
+  const hasConnectedOnce = useChatStore(state => state.hasConnectedOnce)
+  const connect = useChatStore(state => state.connect)
   const [isOpen, setIsOpen] = useState(false)
+  const isNetworkDisconnected = hasConnectedOnce && error !== null
+
+  const handleRetry = useCallback(() => {
+    const wsEndpoint = `${apiUrl}/ws`
+    connect(wsEndpoint)
+  }, [connect])
 
   const handleToggle = () => {
     setIsOpen(prev => !prev)
@@ -27,21 +41,34 @@ export function ChatWidget() {
   const handleSendMessage = (content: string) => {
     if (!isConnected)
       return
-
     sendMessage(content, 'TEXT')
   }
 
-  const handleSendFile = (file: File) => {
-    if (!isConnected)
-      return
+  const handleSendFileSuccess = (fileName: string, fileInfo: FileInfo) => {
+    sendMessage(fileName, 'FILE', fileInfo)
+  }
 
-    sendMessage(file.name, 'FILE', {
-      fileId: crypto.randomUUID(),
-      fileName: file.name,
-      fileUrl: '', // TODO: 파일 업로드 후 URL 설정
-      fileSize: file.size,
-      mimeType: file.type,
-    })
+  const renderChatContent = () => {
+    if (error && !hasConnectedOnce) {
+      return (
+        <ConnectionError
+          error={error}
+          onRetry={handleRetry}
+        />
+      )
+    }
+
+    if (loading) {
+      return <ChatAreaSkelton />
+    }
+
+    return (
+      <ChatArea
+        messages={messages}
+        isNetworkDisconnected={isNetworkDisconnected}
+        onRetryMessage={retryMessage}
+      />
+    )
   }
 
   return (
@@ -64,11 +91,12 @@ export function ChatWidget() {
           onClose={handleToggle}
           onClear={clearMessages}
         />
-        <ChatArea messages={messages} />
+        {renderChatContent()}
 
-        <ChatInput
+        <ChatInputContainer
           onSendMessage={handleSendMessage}
-          onSendFile={handleSendFile}
+          onSendFileSuccess={handleSendFileSuccess}
+          disabled={!isConnected || isNetworkDisconnected}
         />
       </div>
 

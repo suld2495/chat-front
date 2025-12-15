@@ -10,9 +10,12 @@ import { cn } from '@/lib/utils'
 
 import { Typography } from '../ui/typography'
 import { ChatMessage } from './ChatMessage'
+import { SystemMessage } from './SystemMessage'
 
 interface ChatAreaProps {
   messages: Message[]
+  isNetworkDisconnected?: boolean
+  onRetryMessage?: (tempMessageId: string) => void
 }
 
 const content = `
@@ -30,18 +33,59 @@ const emptyMessage: Message = {
   messageType: 'TEXT',
 }
 
-export function ChatArea({ messages }: ChatAreaProps) {
+export function ChatArea({
+  messages,
+  isNetworkDisconnected,
+  onRetryMessage,
+}: ChatAreaProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
+  const lastScrollTimeRef = useRef<number>(0)
+  const scrollRafRef = useRef<number | null>(null)
 
-  const scrollToBottom = useCallback(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+  const scrollToBottom = useCallback((options: { smooth?: boolean, force?: boolean } = {}) => {
+    const { smooth = false, force = false } = options
+
+    if (!scrollRef.current)
+      return
+
+    if (!smooth) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: 'instant',
+      })
+      return
     }
+
+    if (!force) {
+      const now = Date.now()
+      if (now - lastScrollTimeRef.current < 100)
+        return
+      lastScrollTimeRef.current = now
+    }
+
+    if (scrollRafRef.current) {
+      cancelAnimationFrame(scrollRafRef.current)
+    }
+
+    scrollRafRef.current = requestAnimationFrame(() => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollTo({
+          top: scrollRef.current.scrollHeight,
+          behavior: 'smooth',
+        })
+      }
+    })
   }, [])
 
   useEffect(() => {
-    scrollToBottom()
+    scrollToBottom({ smooth: true })
   }, [messages, scrollToBottom])
+
+  useEffect(() => {
+    if (isNetworkDisconnected) {
+      scrollToBottom({ smooth: true })
+    }
+  }, [isNetworkDisconnected, scrollToBottom])
 
   return (
     <div
@@ -76,11 +120,18 @@ export function ChatArea({ messages }: ChatAreaProps) {
                   key={message.messageId}
                   message={message}
                   animate={message.animate}
-                  onAnimationTick={message.animate ? scrollToBottom : undefined}
+                  onAnimationTick={message.animate ? () => scrollToBottom({ smooth: true }) : undefined}
+                  onAnimationEnd={message.animate ? () => scrollToBottom({ smooth: true, force: true }) : undefined}
+                  onRetry={message.tempMessageId && onRetryMessage
+                    ? () => onRetryMessage(message.tempMessageId!)
+                    : undefined}
                 />
               ))}
             </div>
           )}
+      {isNetworkDisconnected && (
+        <SystemMessage message="네트워크 연결이 해제되었습니다" />
+      )}
     </div>
   )
 }

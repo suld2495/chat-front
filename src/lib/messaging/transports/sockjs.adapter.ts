@@ -16,12 +16,11 @@ export class SockJSTransport implements Transport {
       this.connectCallback?.()
     }
 
-    this.socket.onclose = (event) => {
+    this.socket.onclose = () => {
       this.disconnectCallback?.()
     }
 
-    this.socket.onerror = (event) => {
-      console.error('[SockJS] Connection error:', event)
+    this.socket.onerror = () => {
       this.errorCallback?.(new Error('SockJS connection error'))
     }
 
@@ -34,10 +33,6 @@ export class SockJSTransport implements Transport {
   }
 
   getConnection(url: string): WebSocket {
-    if (this.socket) {
-      return this.socket
-    }
-
     return this.connect(url)
   }
 

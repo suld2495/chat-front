@@ -150,4 +150,10 @@
   --color-chat-input: var(--color-chat-bg);
   --color-chat-timestamp: var(--color-text-tertiary);
   --color-muted-foreground: var(--color-text-inverse);
+
+  /* ============================================
+     System Message (네트워크 상태 알림 등)
+   ============================================ */
+  --color-chat-system-bg: var(--color-gray-700);
+  --color-text-chat-system: var(--color-gray-300);
 }

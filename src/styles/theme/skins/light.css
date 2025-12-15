@@ -19,7 +19,7 @@
   --color-brand-200: var(--color-blue-200);
   --color-brand-300: var(--color-blue-300);
   --color-brand-400: var(--color-blue-400);
-  --color-brand-500: var(--color-blue-500);
+  --color-brand-500: #7269ef;
   --color-brand-600: var(--color-blue-600);
   --color-brand-700: var(--color-blue-700);
   --color-brand-800: var(--color-blue-800);
@@ -150,4 +150,10 @@
   --color-chat-input: var(--color-chat-bg);
   --color-chat-timestamp: var(--color-text-tertiary);
   --color-muted-foreground: var(--color-text-inverse);
+
+  /* ============================================
+     System Message (네트워크 상태 알림 등)
+   ============================================ */
+  --color-chat-system-bg: var(--color-gray-200);
+  --color-text-chat-system: var(--color-gray-700);
 }

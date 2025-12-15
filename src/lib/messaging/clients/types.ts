@@ -1,4 +1,8 @@
-import type { Message, SenderMessage } from '@/services/chat/types'
+import type {
+  InitRequest,
+  Message,
+  SenderMessage,
+} from '@/services/chat/types'
 
 export interface ConnectionOptions {
   headers?: Record<string, string>
@@ -31,7 +35,7 @@ export interface MessagingClient {
   connect: (url: string, options?: ConnectionOptions) => void
   disconnect: () => void
   subscribe: (destination: string, callback: (message: MessagingPayload) => void) => Subscription
-  publish: (destination: string, body: SenderMessage) => void
+  publish: (destination: string, body: SenderMessage | InitRequest) => void
   onConnect: (callback: () => void) => void
   onError: (callback: (error: Error) => void) => void
 }

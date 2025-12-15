@@ -1,6 +1,6 @@
 import type { IMessage, StompSubscription } from '@stomp/stompjs'
 
-import { Client } from '@stomp/stompjs'
+import { Client, ReconnectionTimeMode } from '@stomp/stompjs'
 
 import type { Message } from '@/services/chat/types'
 
@@ -11,6 +11,10 @@ import type {
   MessagingPayload,
   Subscription,
 } from './types'
+
+// Exponential backoff 설정
+const INITIAL_RECONNECT_DELAY = 1000
+const MAX_RECONNECT_DELAY = 60000
 
 export class StompAdapter implements MessagingClient {
   private client: Client | null = null
@@ -26,7 +30,6 @@ export class StompAdapter implements MessagingClient {
   }
 
   connect(url: string, options: ConnectionOptions = {}): void {
-    // SockJS Transport의 에러를 STOMP 에러 콜백으로 전달
     this.transport.onError((error) => {
       console.error('[STOMP] Transport error:', error)
       this.errorCallback?.(error)
@@ -37,8 +40,9 @@ export class StompAdapter implements MessagingClient {
 
       connectHeaders: options.headers,
 
-      // 재연결 설정 (개발 중에는 0으로 설정하여 자동 재연결 비활성화 가능)
-      reconnectDelay: options.reconnect?.delay ?? 5000,
+      reconnectDelay: INITIAL_RECONNECT_DELAY,
+      reconnectTimeMode: ReconnectionTimeMode.EXPONENTIAL,
+      maxReconnectDelay: MAX_RECONNECT_DELAY,
 
       heartbeatIncoming: options.heartbeat?.incoming ?? 10000,
       heartbeatOutgoing: options.heartbeat?.outgoing ?? 10000,
@@ -48,7 +52,6 @@ export class StompAdapter implements MessagingClient {
       },
 
       onStompError: (frame) => {
-        console.error('[STOMP] STOMP protocol error:', frame.headers.message)
         this.errorCallback?.(new Error(frame.headers.message || 'STOMP Error'))
       },
 
@@ -56,9 +59,15 @@ export class StompAdapter implements MessagingClient {
         this.disconnectCallback?.()
       },
 
-      onWebSocketError: (event) => {
-        console.error('[STOMP] WebSocket error:', event)
+      onWebSocketError: () => {
         this.errorCallback?.(new Error('WebSocket Error'))
+      },
+
+      onWebSocketClose: (event: CloseEvent) => {
+        if (!event.wasClean) {
+          const errorMessage = event.reason || '서버에 연결할 수 없습니다.'
+          this.errorCallback?.(new Error(errorMessage))
+        }
       },
     })
 
@@ -120,18 +129,13 @@ export class StompAdapter implements MessagingClient {
     this.disconnectCallback = callback
   }
 
-  /**
-   * STOMP 메시지를 공통 Message 타입으로 변환
-   * WebSocket API 명세의 MessageReceived → Message 변환
-   */
+  // STOMP 메시지를 공통 Message 타입으로 변환
   private convertToMessage(frame: IMessage): MessagingPayload {
     let body: Message
 
     try {
-      // WebSocket API 명세에 따른 메시지 파싱
       const parsed = JSON.parse(frame.body)
 
-      // MessageReceived 타입의 경우 Message로 변환
       if (parsed.type === 'message') {
         body = {
           messageId: parsed.messageId,
@@ -142,26 +146,19 @@ export class StompAdapter implements MessagingClient {
           senderId: parsed.senderId,
           senderName: parsed.senderName,
           fileInfo: parsed.fileInfo,
-          templateInfo: parsed.templateInfo,
           read: parsed.read,
-          readAt: parsed.readAt,
-          aiGenerated: parsed.aiGenerated,
-          aiConfidence: parsed.aiConfidence,
-          metadata: parsed.metadata,
           createdAt: parsed.createdAt,
+          tempMessageId: parsed.tempMessageId,
         }
       }
-      // ConnectedMessage의 recentMessages 배열도 처리
       else if (Array.isArray(parsed)) {
         body = parsed[0] || this.createDefaultMessage(frame.body)
       }
-      // 기타 메시지는 그대로 사용 (타입 체크 우회)
       else {
         body = parsed as Message
       }
     }
     catch {
-      // 파싱 실패 시 기본 메시지 생성
       body = this.createDefaultMessage(frame.body)
     }
 
@@ -174,9 +171,6 @@ export class StompAdapter implements MessagingClient {
     }
   }
 
-  /**
-   * 기본 메시지 생성 (파싱 실패 시)
-   */
   private createDefaultMessage(content: string): Message {
     return {
       messageId: crypto.randomUUID(),

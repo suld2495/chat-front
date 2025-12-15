@@ -53,6 +53,7 @@ type InputVariants = VariantProps<typeof inputVariants>
 interface InputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>,
   Omit<InputVariants, 'error' | 'success'> {
+  ref?: React.Ref<HTMLInputElement>
   error?: boolean
   success?: boolean
   helperText?: string
@@ -60,6 +61,7 @@ interface InputProps
 }
 
 export function Input({
+  ref,
   variant,
   size,
   fullWidth,
@@ -81,6 +83,7 @@ export function Input({
         </label>
       )}
       <input
+        ref={ref}
         className={cn(
           inputVariants({
             variant,

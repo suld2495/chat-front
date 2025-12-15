@@ -1,3 +1,5 @@
+import { apiUrl } from '@/lib/const'
+
 /**
  * API 에러 클래스
  */
@@ -184,6 +186,6 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient({
-  baseURL: import.meta.env.VITE_API_URL || '',
+  baseURL: apiUrl || '',
   timeout: 30000, // 30초
 })
