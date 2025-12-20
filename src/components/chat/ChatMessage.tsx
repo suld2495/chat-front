@@ -64,7 +64,7 @@ export const ChatMessage = memo(({
     <div
       id={`message-${message.messageId}`}
       className={cn(
-        'flex gap-2 px-2 sm:gap-3 sm:px-4',
+        'flex gap-3 px-4',
         isUser ? 'flex-row-reverse' : 'flex-row',
         isShaking && 'animate-shake',
       )}
@@ -72,7 +72,7 @@ export const ChatMessage = memo(({
       <div className="shrink-0 mt-1">
         <div
           className={cn(
-            'w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden flex items-center justify-center',
+            'w-8 h-8 rounded-full overflow-hidden flex items-center justify-center',
           )}
         >
           <img src={isUser ? userProfile : botProfile} />
@@ -81,7 +81,7 @@ export const ChatMessage = memo(({
 
       <div
         className={cn(
-          'flex flex-col max-w-[85%] sm:max-w-[75%]',
+          'flex flex-col max-w-[75%]',
           isUser ? 'items-end' : 'items-start',
         )}
       >

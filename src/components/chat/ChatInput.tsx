@@ -98,7 +98,7 @@ export function ChatInput({
             resize="none"
             className={cn(
               'overflow-hidden',
-              'text-s sm:text-sm',
+              'text-sm',
               (disabled || isUploading) && 'opacity-50 cursor-not-allowed',
             )}
             style={{ maxHeight: '120px' }}
