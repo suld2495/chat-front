@@ -1,9 +1,9 @@
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 
-import type { FileInfo } from '@/services/chat/types'
-
-import { useChatConnection, useChatMessages } from '@/hooks/chat'
-import { apiUrl } from '@/lib/const'
+import { useChatConnection } from '@/hooks/chat'
+import { useResizable } from '@/hooks/useResizable'
+import { useViewport } from '@/hooks/useViewport'
+import { MOBILE_WIDGET_PADDING, WIDGET_INITIAL_SIZE } from '@/lib/const'
 import { cn } from '@/lib/utils'
 import { useChatStore } from '@/stores/chat'
 
@@ -13,96 +13,165 @@ import { ChatHeader } from './ChatHeader'
 import { ChatInputContainer } from './ChatInputContainer'
 import { ChatWidgetButton } from './ChatWidgetButton'
 import { ConnectionError } from './ConnectionError'
+import { ResizeHandle } from './ResizeHandle'
+
+interface ResizableContainerProps {
+  isOpen: boolean
+  children: React.ReactNode
+}
+
+function ResizableContainer({ isOpen, children }: ResizableContainerProps) {
+  const {
+    isMobile,
+    width: viewportWidth,
+    height: viewportHeight,
+  } = useViewport()
+
+  const {
+    size,
+    isResizing,
+    handleMouseDown,
+    activeDirection,
+    maxHeight,
+  } = useResizable({ initialSize: WIDGET_INITIAL_SIZE })
+
+  // 모바일 풀스크린 모드 크기 계산
+  const mobileWidth = viewportWidth - (MOBILE_WIDGET_PADDING * 2)
+  const mobileHeight = viewportHeight - (MOBILE_WIDGET_PADDING * 2)
+
+  const widgetStyle = isMobile
+    ? {
+        width: `${mobileWidth}px`,
+        height: `${mobileHeight}px`,
+        top: `${MOBILE_WIDGET_PADDING}px`,
+        left: `${MOBILE_WIDGET_PADDING}px`,
+        right: `${MOBILE_WIDGET_PADDING}px`,
+        bottom: `${MOBILE_WIDGET_PADDING}px`,
+      }
+    : {
+        width: `${size.width}px`,
+        height: `${size.height}px`,
+        maxHeight: `${maxHeight}px`,
+        right: '24px',
+        bottom: '96px',
+      }
+
+  return (
+    <div
+      className={cn(
+        'fixed z-50',
+        'flex flex-col',
+        'bg-chat-widget overflow-visible',
+        'shadow-xl',
+        isMobile ? 'rounded-xl' : 'rounded-2xl',
+        !isResizing && 'transition-all duration-300 ease-out',
+        isOpen
+          ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto slide-up-enter'
+          : 'opacity-0 translate-y-4 scale-95 pointer-events-none',
+      )}
+      style={widgetStyle}
+    >
+      {!isMobile && (
+        <>
+          <ResizeHandle
+            direction="top-left"
+            onMouseDown={handleMouseDown('top-left')}
+            isActive={activeDirection === 'top-left'}
+          />
+          <ResizeHandle
+            direction="top-right"
+            onMouseDown={handleMouseDown('top-right')}
+            isActive={activeDirection === 'top-right'}
+          />
+          <ResizeHandle
+            direction="bottom-left"
+            onMouseDown={handleMouseDown('bottom-left')}
+            isActive={activeDirection === 'bottom-left'}
+          />
+        </>
+      )}
+
+      <div className={cn(
+        'flex flex-col flex-1 overflow-hidden',
+        isMobile ? 'rounded-xl' : 'rounded-2xl',
+      )}
+      >
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function ChatWidgetContent() {
+  const { error, isInitialized } = useChatConnection()
+  const init = useChatStore(state => state.init)
+
+  const handleRetry = () => {
+    init()
+  }
+
+  if (error && !isInitialized) {
+    return (
+      <ConnectionError
+        error={error}
+        onRetry={handleRetry}
+      />
+    )
+  }
+
+  if (!isInitialized) {
+    return <ChatAreaSkelton />
+  }
+
+  return (
+    <>
+      <ChatArea />
+      <ChatInputContainer />
+    </>
+  )
+}
+
+interface WidgetButtonProps {
+  isOpen: boolean
+  onToggle: () => void
+}
+
+function WidgetButton({ isOpen, onToggle }: WidgetButtonProps) {
+  const { isMobile } = useViewport()
+
+  // 모바일에서 위젯이 열려있으면 버튼 숨김
+  if (isMobile && isOpen) {
+    return null
+  }
+
+  return (
+    <ChatWidgetButton
+      isOpen={isOpen}
+      onClick={onToggle}
+    />
+  )
+}
 
 export function ChatWidget() {
-  const { error } = useChatConnection()
-  const {
-    loading,
-    messages,
-    sendMessage,
-    clearMessages,
-    retryMessage,
-  } = useChatMessages()
-  const isConnected = useChatStore(state => state.isConnected)
-  const hasConnectedOnce = useChatStore(state => state.hasConnectedOnce)
-  const connect = useChatStore(state => state.connect)
   const [isOpen, setIsOpen] = useState(false)
-  const isNetworkDisconnected = hasConnectedOnce && error !== null
-
-  const handleRetry = useCallback(() => {
-    const wsEndpoint = `${apiUrl}/ws`
-    connect(wsEndpoint)
-  }, [connect])
 
   const handleToggle = () => {
     setIsOpen(prev => !prev)
   }
 
-  const handleSendMessage = (content: string) => {
-    if (!isConnected)
-      return
-    sendMessage(content, 'TEXT')
-  }
-
-  const handleSendFileSuccess = (fileName: string, fileInfo: FileInfo) => {
-    sendMessage(fileName, 'FILE', fileInfo)
-  }
-
-  const renderChatContent = () => {
-    if (error && !hasConnectedOnce) {
-      return (
-        <ConnectionError
-          error={error}
-          onRetry={handleRetry}
-        />
-      )
-    }
-
-    if (loading) {
-      return <ChatAreaSkelton />
-    }
-
-    return (
-      <ChatArea
-        messages={messages}
-        isNetworkDisconnected={isNetworkDisconnected}
-        onRetryMessage={retryMessage}
-      />
-    )
-  }
-
   return (
     <>
-      <div
-        className={cn(
-          'fixed bottom-24 right-6 z-50',
-          'w-[380px] h-[580px] max-h-[calc(100vh-120px)]',
-          'flex flex-col',
-          'bg-chat-widget rounded-2xl overflow-hidden',
-          'shadow-xl',
-          'transition-all duration-300 ease-out',
-          isOpen
-            ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto slide-up-enter'
-            : 'opacity-0 translate-y-4 scale-95 pointer-events-none',
-        )}
-      >
+      <ResizableContainer isOpen={isOpen}>
         <ChatHeader
           title="성민데모(TalkCRM)"
           onClose={handleToggle}
-          onClear={clearMessages}
         />
-        {renderChatContent()}
+        <ChatWidgetContent />
+      </ResizableContainer>
 
-        <ChatInputContainer
-          onSendMessage={handleSendMessage}
-          onSendFileSuccess={handleSendFileSuccess}
-          disabled={!isConnected || isNetworkDisconnected}
-        />
-      </div>
-
-      <ChatWidgetButton
+      <WidgetButton
         isOpen={isOpen}
-        onClick={handleToggle}
+        onToggle={handleToggle}
       />
     </>
   )

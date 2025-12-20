@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils'
 
-import { Typography } from '../ui/typography'
+import { Typography } from '../../ui/typography'
 
 interface SystemMessageProps {
   message: string

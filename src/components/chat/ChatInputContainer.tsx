@@ -1,25 +1,21 @@
 import { useRef, useState } from 'react'
 
-import type { FileInfo } from '@/services/chat/types'
-
 import { getUploadErrorMessage, uploadFile } from '@/api/file'
+import { useChatActions, useChatConnection } from '@/hooks/chat'
+import { useFileUpload } from '@/hooks/useFileUpload'
 
 import { Input } from '../ui/input'
 import { ChatInput } from './ChatInput'
 import { FilePreview } from './FilePreview'
-import { useFileUpload } from './hooks/useFileUpload'
 
-interface ChatInputContainerProps {
-  onSendMessage: (content: string) => void
-  onSendFileSuccess: (fileName: string, fileInfo: FileInfo) => void
-  disabled?: boolean
-}
-
-export function ChatInputContainer({
-  onSendMessage,
-  onSendFileSuccess,
-  disabled = false,
-}: ChatInputContainerProps) {
+export function ChatInputContainer() {
+  const { isInitialized } = useChatConnection()
+  const {
+    sendMessage,
+    sendFileMessage,
+    isStreaming,
+  } = useChatActions()
+  const disabled = !isInitialized || isStreaming
   const [uploadProgress, setUploadProgress] = useState<number | undefined>(
     undefined,
   )
@@ -52,7 +48,7 @@ export function ChatInputContainer({
         signal: uploadAbortRef.current.signal,
       })
 
-      onSendFileSuccess(currentFile.name, fileInfo)
+      sendFileMessage(currentFile.name, fileInfo)
 
       handleFileRemove()
       setUploadProgress(undefined)
@@ -89,7 +85,7 @@ export function ChatInputContainer({
   return (
     <>
       <ChatInput
-        onSendMessage={onSendMessage}
+        onSendMessage={sendMessage}
         onSendFile={handleSendFile}
         onFileButtonClick={handleFileClick}
         disabled={disabled}

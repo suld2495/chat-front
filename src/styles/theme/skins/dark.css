@@ -156,4 +156,13 @@
    ============================================ */
   --color-chat-system-bg: var(--color-gray-700);
   --color-text-chat-system: var(--color-gray-300);
+
+  /* ============================================
+     Search Highlight
+   ============================================ */
+  --color-highlight: #854D0E;
+  --color-highlight-user: #FDE047;
+  --color-highlight-user-fg: #1E293B;
+  --color-highlight-current: #A16207;
+  --color-search-bar-bg: var(--color-gray-800);
 }

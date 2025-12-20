@@ -53,8 +53,9 @@ export function ChatInput({
   }
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault()
+      e.stopPropagation()
       handleSubmit()
     }
   }
@@ -97,6 +98,7 @@ export function ChatInput({
             resize="none"
             className={cn(
               'overflow-hidden',
+              'text-s sm:text-sm',
               (disabled || isUploading) && 'opacity-50 cursor-not-allowed',
             )}
             style={{ maxHeight: '120px' }}
