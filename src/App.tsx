@@ -26,6 +26,7 @@ function ThemeSelector() {
 function App() {
   return (
     <div className="h-dvh max-h-dvh bg-background-base text-text-primary flex items-center justify-center overflow-hidden">
+      <ThemeSelector />
       <ChatWidget />
     </div>
   )
